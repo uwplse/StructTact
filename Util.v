@@ -4,7 +4,7 @@ Require Import NPeano.
 Require Import List.
 Import ListNotations.
 Require Import Sorting.Permutation.
-Require Import Tactics.
+Require Import StructTactics.
 
 Set Implicit Arguments.
 
