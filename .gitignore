@@ -6,3 +6,4 @@ Makefile.coq
 .coq-native/
 *.aux
 *.vio
+_CoqProject
