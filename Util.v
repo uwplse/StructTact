@@ -291,7 +291,7 @@ Proof.
     find_apply_lem_hyp filter_In. intuition.
     eauto.
 Qed.
-    
+
 
 Lemma filter_true_id : forall A (f : A -> bool) xs,
                          (forall x, In x xs -> f x = true) ->
@@ -1804,7 +1804,7 @@ Proof.
   intros.
   induction l; simpl in *; intuition; congruence.
 Qed.
-  
+
 Lemma snoc_assoc :
   forall A (l : list A) x y,
     l ++ [x; y] = (l ++ [x]) ++ [y].
