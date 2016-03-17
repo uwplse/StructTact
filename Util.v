@@ -1891,40 +1891,22 @@ Proof.
     repeat find_rewrite. intuition.
 Qed.
 
-Require Import mathcomp.ssreflect.ssreflect.
-
 Lemma map_eq_inv :
   forall (A B : Type) (f : A -> B) (l : list A) xs ys,
     map f l = xs ++ ys ->
     exists l1, exists l2, l = l1 ++ l2 /\ map f l1 = xs /\ map f l2 = ys.
 Proof.
-move => A B f.
-elim => /=.
-- case => //.
-  case => //.
-  move => H_eq.
-  by exists []; exists [].
-- move => a l IH.
-  case => /=.
-  * move => ys.
-    rewrite /=.
-    case: ys => //.
-    move => b ys' H_eq.
-    inversion H_eq.
-    have IH' := IH [] ys'.
-    rewrite /= in IH'.
-    apply IH' in H1.
-    move: H1 => [l1 [l2 [H_eq_l [H_eq_l1 H_eq_l2]]]].   
-    exists ([]); exists (a :: l2).
-    case: l1 H_eq_l H_eq_l1 => //= H_eq_l H_eq_l1.
-    by rewrite /= H_eq_l H_eq_l2.    
-  * move => b xs' ys H_eq.
-    inversion H_eq.
-    apply IH in H1.
-    move: H1 => [l1 [l2 [H_eq_l [H_eq_l1 H_eq_l2]]]].
-    exists (a :: l1); exists l2.
-    rewrite /=.
-    by rewrite H_eq_l H_eq_l1 H_eq_l2.
+  induction l; simpl; intros xs ys H.
+  - symmetry in H. apply app_eq_nil in H. break_and. subst.
+    exists [], []. auto.
+  - destruct xs; simpl in *.
+    + exists [], (a :: l). intuition.
+    + invc H. find_apply_hyp_hyp.
+      break_exists_name l1.
+      break_exists_name l2.
+      break_and.
+      exists (a :: l1), l2. subst.
+      intuition.
 Qed.
 
 Lemma map_eq_inv_eq :
@@ -1932,23 +1914,15 @@ Lemma map_eq_inv_eq :
     (forall a a', f a = f a' -> a = a') ->
     forall l l', map f l = map f l' -> l = l'.
 Proof.
-move => A B f H_inj.
-elim; first by case.
-move => a l IH.
-case => //=.
-move => a' l' H_eq.
-inversion H_eq.
-have H_eq' := IH _ H1.
-apply H_inj in H0.
-by rewrite H0 H_eq'.
+  induction l; simpl; intros l' Heq; destruct l'; simpl in *; try congruence.
+  find_inversion. auto using f_equal2.
 Qed.
 
-Lemma map_fst_snd_id : 
+Lemma map_fst_snd_id :
   forall A B l, map (fun t : A * B => (fst t, snd t)) l = l.
 Proof.
-move => A B.
-elim => //.
-move => a l IH.
-rewrite /= IH.
-by case: a.
+  intros.
+  rewrite <- map_id.
+  apply map_ext.
+  destruct a; auto.
 Qed.
