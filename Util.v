@@ -28,6 +28,13 @@ Proof.
   - simpl. rewrite IHxs. break_if; auto.
 Qed.
 
+Ltac invc_NoDup :=
+  repeat match goal with
+  | [ H : NoDup (_ :: _) |- _ ] => invc H
+  end.
+
+Hint Constructors NoDup.
+
 Section dedup.
   Variable A : Type.
   Hypothesis A_eq_dec : forall x y : A, {x = y} + {x <> y}.
@@ -55,11 +62,9 @@ Section dedup.
       In x xs ->
       In x (dedup xs).
   Proof.
-    induction xs; intros.
-    - simpl in *. intuition.
-    - simpl in *. break_if; intuition.
-      + subst. auto.
-      + subst. simpl. auto.
+    induction xs; intros; simpl in *.
+    - intuition.
+    - break_if; intuition; subst; simpl; auto.
   Qed.
 
   Lemma filter_dedup (pred : A -> bool) :
@@ -67,15 +72,12 @@ Section dedup.
       pred p = false ->
       filter pred (dedup (xs ++ ys)) = filter pred (dedup (xs ++ p :: ys)).
   Proof.
-    intros. induction xs.
-    - simpl. repeat (break_match; simpl; auto; try discriminate).
-    - simpl. repeat (break_match; simpl; auto).
+    intros.
+    induction xs; simpl; repeat (break_match; simpl);
+      auto using f_equal2; try discriminate.
       + exfalso. apply n. apply in_app_iff. apply in_app_or in i. intuition.
       + exfalso. apply n. apply in_app_or in i. intuition.
-        * simpl in *. intuition. subst. rewrite Heqb in H. discriminate.
-      + rewrite IHxs. auto.
-      + discriminate.
-      + discriminate.
+        * simpl in *. intuition. congruence.
   Qed.
 
   Lemma dedup_app : forall (xs ys : list A),
@@ -100,18 +102,18 @@ Section dedup.
       In x (dedup xs) ->
       In x xs.
   Proof.
-    induction xs; intros.
-    - simpl in *; intuition.
-    - simpl in *. break_if; simpl in *; intuition.
+    induction xs; intros; simpl in *.
+    - intuition.
+    - break_if; simpl in *; intuition.
   Qed.
 
   Lemma NoDup_dedup :
     forall (xs : list A),
       NoDup (dedup xs).
   Proof.
-    induction xs.
-    - simpl. constructor.
-    - simpl. break_if; auto.
+    induction xs; simpl.
+    - constructor.
+    - break_if; auto.
       constructor; auto.
       intro.
       apply n.
@@ -147,35 +149,23 @@ Section dedup.
   Proof.
     induction xs; intros.
     - auto.
-    - simpl. repeat (break_match; simpl); auto.
+    - simpl. repeat (break_match; simpl); auto using f_equal.
       + exfalso. apply n0. apply remove_preserve; auto.
       + exfalso. apply n. eapply in_remove; eauto.
-      + f_equal. auto.
   Qed.
 
   Lemma remove_partition :
     forall xs (p : A) ys,
       remove A_eq_dec p (xs ++ p :: ys) = remove A_eq_dec p (xs ++ ys).
   Proof.
-    induction xs; intros.
-    - simpl. break_if; congruence.
-    - simpl. break_if.
-      + auto.
-      + f_equal. auto.
+    induction xs; intros; simpl; break_if; congruence.
   Qed.
 
   Lemma remove_not_in : forall (x : A) xs,
       ~ In x xs ->
       remove A_eq_dec x xs = xs.
   Proof.
-    intros. induction xs.
-    - intuition.
-    - simpl. break_match.
-      + exfalso. apply H.
-        subst. intuition.
-      + f_equal. apply IHxs.
-        intro Hin.
-        apply H. simpl. intuition.
+    intros. induction xs; simpl in *; try break_if; intuition congruence.
   Qed.
 
   Lemma dedup_partition :
@@ -183,11 +173,10 @@ Section dedup.
       dedup (xs ++ p :: ys) = xs' ++ p :: ys' ->
       remove A_eq_dec p (dedup (xs ++ ys)) = xs' ++ ys'.
   Proof.
-    intros.
+    intros xs p ys xs' ys' H.
     f_apply H (remove A_eq_dec p).
-    rewrite remove_dedup_comm in *.
-    rewrite remove_partition in *.
-    rewrite H0.
+    rewrite remove_dedup_comm, remove_partition in *.
+    find_rewrite.
     rewrite remove_partition.
 
     apply remove_not_in.
@@ -201,7 +190,7 @@ Section dedup.
   Proof.
     induction xs; intros.
     - auto.
-    - simpl. invc H. concludes. rewrite IHxs.
+    - simpl. invc_NoDup. concludes.
       break_if; congruence.
   Qed.
 
@@ -234,14 +223,11 @@ Lemma NoDup_map_injective : forall A B (f : A -> B) xs,
 Proof.
   induction xs; intros.
   - constructor.
-  - simpl. constructor.
-    + intro.
-      do_in_map.
-      specialize (H a x).
-      repeat conclude H intuition.
-      subst.
-      invc H0. auto.
-    + apply IHxs. intuition. inv H0. auto.
+  - simpl. invc_NoDup. constructor.
+    + intro. do_in_map.
+      assert (x = a) by intuition.
+      congruence.
+    + intuition.
 Qed.
 
 Lemma NoDup_disjoint_append :
@@ -253,12 +239,9 @@ Lemma NoDup_disjoint_append :
 Proof.
   induction l; intros.
   - auto.
-  - simpl. constructor.
-    + intro. do_in_app. intuition.
-      * invc H. auto.
-      * apply (H1 a); intuition.
-    + invc H. apply IHl; auto.
-      intros. apply H1. intuition.
+  - simpl. invc_NoDup. constructor.
+    + intro. do_in_app. intuition eauto with *.
+    + intuition eauto with *.
 Qed.
 
 Lemma filter_NoDup :
@@ -268,10 +251,9 @@ Lemma filter_NoDup :
 Proof.
   induction l; intros.
   - auto.
-  - invc H. simpl. break_if.
-    + constructor; auto.
-      intro. apply filter_In in H. intuition.
-    + auto.
+  - invc_NoDup. simpl. break_if; auto.
+    constructor; auto.
+    intro. apply filter_In in H. intuition.
 Qed.
 
 
@@ -282,14 +264,13 @@ Lemma NoDup_map_filter :
 Proof.
   intros. induction l; simpl in *.
   - constructor.
-  - match goal with | H : NoDup _ |- _ => invcs H end.
-    intuition.
-    break_if; simpl in *; intuition.
-    constructor; intuition.
-    match goal with | H : _ -> False |- False => apply H end.
-    do_in_map. apply in_map_iff.
+  - invc_NoDup. concludes.
+    break_if; simpl in *; auto.
+    constructor; auto.
+    intro. do_in_map.
     find_apply_lem_hyp filter_In. intuition.
-    eauto.
+    match goal with | H : _ -> False |- False => apply H end.
+    apply in_map_iff. eauto.
 Qed.
 
 
@@ -299,15 +280,13 @@ Lemma filter_true_id : forall A (f : A -> bool) xs,
 Proof.
   induction xs; intros.
   - auto.
-  - simpl. rewrite H by intuition. rewrite IHxs by intuition. auto.
+  - simpl. now rewrite H, IHxs by intuition.
 Qed.
 
 Lemma map_of_map : forall A B C (f : A -> B) (g : B -> C) xs,
                      map g (map f xs) = map (fun x => g (f x)) xs.
 Proof.
-  induction xs.
-  - auto.
-  - simpl. f_equal. auto.
+  induction xs; simpl; auto using f_equal2.
 Qed.
 
 Lemma filter_except_one : forall A A_eq_dec (f g : A -> bool) x xs,
@@ -320,9 +299,10 @@ Proof.
   induction xs; intros.
   - auto.
   - simpl.
-    pose proof (A_eq_dec x a).
-    intuition; repeat (break_match; simpl); try congruence; subst; intuition; f_equal; intuition;
-    rewrite (H a) in * by intuition; congruence.
+    break_if.
+    + subst. repeat find_rewrite. eauto with *.
+    + simpl. rewrite H by auto with *.
+      break_if; eauto using f_equal2 with *.
 Qed.
 
 Lemma flat_map_nil : forall A B (f : A -> list B) l,
@@ -365,6 +345,7 @@ Proof.
   repeat break_match; subst; simpl in *; intuition; subst; eauto;
   right; (eapply IHzs; [|eauto]); simpl; eauto.
 Qed.
+
 Lemma subseq_In :
   forall A (ys xs : list A) x,
     subseq xs ys ->
@@ -385,14 +366,11 @@ Theorem subseq_NoDup :
 Proof.
   induction ys; intros.
   - destruct xs; simpl in *; intuition.
-  - simpl in *. invc H0.
+  - simpl in *. invc_NoDup.
     break_match.
     + constructor.
     + intuition.
-      subst. constructor.
-      * intro. apply H3.
-        eapply subseq_In; eauto.
-      * eauto.
+      subst. constructor; eauto using subseq_In.
 Qed.
 
 Lemma subseq_remove :
@@ -412,28 +390,17 @@ Theorem NoDup_Permutation_NoDup :
     Permutation l l' ->
     NoDup l'.
 Proof.
-  intros. induction H0.
-  - auto.
-  - invc H. constructor; auto.
-    intro. apply H3. apply Permutation_in with (l := l'); auto.
-    symmetry. auto.
-  - invc H. invc H3. constructor.
-    * simpl in *. intuition.
-    * constructor; simpl in *; intuition.
-  - auto.
+  intros A l l' Hnd Hp.
+  induction Hp; auto; invc_NoDup; constructor;
+    eauto using Permutation_in, Permutation_sym;
+    simpl in *; intuition.
 Qed.
 
 Theorem NoDup_append :
   forall A l (a : A),
     NoDup (l ++ [a]) <-> NoDup (a :: l).
 Proof.
-  intros.
-  split; intro.
-  - eapply NoDup_Permutation_NoDup; try eassumption.
-    symmetry.
-    apply Permutation_cons_append.
-  - eapply NoDup_Permutation_NoDup; try eassumption.
-    apply Permutation_cons_append.
+  intuition eauto using NoDup_Permutation_NoDup, Permutation_sym, Permutation_cons_append.
 Qed.
 
 Lemma leb_false_lt : forall m n, leb m n = false -> n < m.
@@ -490,12 +457,11 @@ Lemma NoDup_map_elim :
     In y xs ->
     x = y.
 Proof.
-  induction xs; intros.
-  - simpl in *. intuition.
-  - simpl in *. invc H0. intuition; subst.
-    + auto.
-    + exfalso. repeat find_rewrite. apply H5. apply in_map. auto.
-    + exfalso. apply H5. rewrite <- H. apply in_map. auto.
+  induction xs; intros; simpl in *.
+  - intuition.
+  - invc_NoDup. intuition; subst; auto; exfalso.
+    + repeat find_rewrite. auto using in_map.
+    + repeat find_reverse_rewrite. auto using in_map.
 Qed.
 
 Lemma subseq_map :
@@ -503,13 +469,12 @@ Lemma subseq_map :
     subseq xs ys ->
     subseq (map f xs) (map f ys).
 Proof.
-  induction ys; intros.
-  - simpl in *. repeat break_match; try discriminate; auto.
-  - simpl in *. repeat break_match; try discriminate; auto.
-    simpl in *. find_inversion.
+  induction ys; intros; simpl in *.
+  - repeat break_match; try discriminate; auto.
+  - repeat break_match; try discriminate; auto.
     intuition.
-    + subst. auto.
-    + right. apply IHys in H0. auto.
+    + subst. simpl in *. find_inversion. auto.
+    + right. repeat find_reverse_rewrite. auto.
 Qed.
 
 Lemma subseq_cons_drop :
@@ -534,31 +499,20 @@ Lemma subseq_subseq_eq :
     subseq ys xs ->
     xs = ys.
 Proof.
-  induction xs; intros.
-  - destruct ys; auto; simpl in *; intuition.
-  - destruct ys; simpl in *.
-    + intuition.
-    + intuition.
-      * f_equal; eauto.
-      * f_equal; eauto using subseq_cons_drop.
-      * f_equal; eauto using subseq_cons_drop.
-      * exfalso.
-        apply subseq_length in H1.
-        apply subseq_length in H.
-        simpl in *. omega.
+  induction xs; intros; destruct ys; simpl in *;
+    intuition eauto using f_equal2, subseq_cons_drop.
+  exfalso.
+  repeat find_apply_lem_hyp subseq_length.
+  simpl in *. omega.
 Qed.
 
 Lemma subseq_filter :
   forall A (f : A -> bool) xs,
     subseq (filter f xs) xs.
 Proof.
-  induction xs; intros.
-  - simpl. auto.
-  - simpl. repeat break_match.
-    + discriminate.
-    + auto.
-    + find_inversion. auto.
-    + right. rewrite <- Heql. eauto.
+  induction xs; intros; simpl.
+  - auto.
+  - repeat break_match; intuition congruence.
 Qed.
 
 Fixpoint take A (n : nat) (xs : list A) : list A :=
@@ -585,14 +539,9 @@ Lemma remove_length_in : forall A A_eq_dec (x : A) xs,
                            NoDup xs ->
                            S (length (remove A_eq_dec x xs)) = length xs.
 Proof.
-  induction xs; intros.
-  - simpl in *. intuition.
-  - simpl in *. intuition.
-    + subst. break_if; try congruence.
-      inv H0.
-      rewrite remove_length_not_in; auto.
-    + invc H0.
-      break_if; subst; intuition.
+  induction xs; intros; simpl in *; intuition; invc_NoDup;
+    break_if; subst; intuition (simpl; try congruence).
+  now rewrite remove_length_not_in.
 Qed.
 
 
@@ -606,50 +555,45 @@ Lemma subset_size_eq :
       (forall x, In x ys -> In x xs).
 Proof.
   induction xs; intros.
-  - destruct ys; try discriminate. auto.
-  - simpl in *. inv H. concludes.
-    pose proof H1 a (or_introl eq_refl).
-    apply in_split in H4. break_exists. subst.
-    specialize (IHxs (x0 ++ x1)).
+  - destruct ys; simpl in *; congruence.
+  - invc_NoDup. concludes.
+    assert (In a ys) by eauto with *.
 
+    find_apply_lem_hyp in_split.
+    break_exists_name l1.
+    break_exists_name l2.
+    subst.
+
+    specialize (IHxs (l1 ++ l2)).
+
+    conclude_using ltac:(eauto using NoDup_remove_1).
 
     forward IHxs.
-    eapply NoDup_remove_1; eauto.
-    concludes. clear H4.
-
+    intros x' Hx'.
+    assert (In x' (l1 ++ a :: l2)) by eauto with *.
+    do_in_app. simpl in *. intuition. subst. congruence.
+    concludes.
 
     forward IHxs.
-    intros. pose proof H1 x2 (or_intror H4).
-    pose proof NoDup_remove_2 x0 x1 a H0.
-    apply in_app_or in H5. simpl in *. intuition. subst. congruence.
-    concludes. clear H4.
+    rewrite app_length in *. simpl in *. omega.
+    concludes.
 
-    forward IHxs. rewrite app_length in *. simpl in *. omega.
-    concludes.  clear H4.
-
-    apply in_app_or in H3. simpl in *. intuition.
+    do_in_app. simpl in *. intuition.
 Qed.
 
 Lemma in_take : forall A n (x : A) xs,
                   In x (take n xs) -> In x xs.
 Proof.
-  induction n; intros.
-  - simpl in *. intuition.
-  - simpl in *. break_match.
-    + simpl in *. intuition.
-    + simpl in *. intuition.
+  induction n; simpl; intuition; break_match; simpl in *; intuition.
 Qed.
 
 Lemma take_NoDup : forall A n (xs : list A),
                      NoDup xs ->
                      NoDup (take n xs).
 Proof.
-  induction n; intros.
-  - destruct xs; simpl in *; intuition. constructor.
-  - simpl. destruct xs.
-    + auto.
-    + invc H. constructor; auto.
-      intro. apply in_take in H. auto.
+  induction n; intros; simpl; destruct xs; auto.
+  invc_NoDup.
+  eauto 6 using in_take.
 Qed.
 
 Lemma remove_NoDup :
@@ -659,11 +603,7 @@ Lemma remove_NoDup :
 Proof.
   induction xs; intros.
   - auto.
-  - invc H. simpl. break_if.
-    + auto.
-    + constructor.
-      * intro. apply H2. eapply in_remove; eauto.
-      * auto.
+  - invc_NoDup. simpl. break_if; eauto 6 using in_remove.
 Qed.
 
 Lemma seq_range :
@@ -671,10 +611,9 @@ Lemma seq_range :
     In x (seq a n) ->
     a <= x < a + n.
 Proof.
-  induction n; intros.
-  - simpl in *. intuition.
-  - simpl in *. invc H. intuition.
-    apply IHn in H0. omega.
+  induction n; intros; simpl in *.
+  - intuition.
+  - break_or_hyp; try find_apply_hyp_hyp; intuition.
 Qed.
 
 
@@ -684,20 +623,17 @@ Lemma take_length : forall A n (xs : list A),
 Proof.
   induction n; intros.
   - auto.
-  - simpl. break_match.
-    + simpl in *. omega.
-    + simpl in *. rewrite IHn by omega. auto.
+  - simpl. break_match; simpl in *.
+    + omega.
+    + now rewrite IHn by omega.
 Qed.
 
 
 Lemma seq_NoDup : forall n a ,
                     NoDup (seq a n).
 Proof.
-  induction n; intros; simpl in *.
-  - constructor.
-  - constructor.
-    intro. apply seq_range in H. omega.
-    auto.
+  induction n; intros; simpl in *; constructor; auto.
+  intro. apply seq_range in H. omega.
 Qed.
 
 Lemma remove_length_ge : forall A A_eq_dec (x : A) xs,
@@ -706,7 +642,7 @@ Lemma remove_length_ge : forall A A_eq_dec (x : A) xs,
 Proof.
   induction xs; intros.
   - auto.
-  - inv H. simpl. break_if.
+  - invc_NoDup. simpl. break_if.
     + rewrite <- minus_n_O.
       subst.
       rewrite remove_length_not_in; auto.
@@ -729,16 +665,13 @@ Lemma remove_length_lt :
     In x xs ->
     length xs > length (remove eq_dec x xs).
 Proof.
-  induction xs; intros.
-  - simpl in *. intuition.
-  - simpl in *.
-    intuition.
-    + subst.
-      break_if; try congruence.
-      pose proof remove_length_le x xs eq_dec.
-      omega.
-    + specialize (IHxs eq_dec H0).
-      break_if; subst; simpl; omega.
+  induction xs; intros; simpl in *; intuition.
+  - subst.
+    break_if; try congruence.
+    pose proof remove_length_le x xs eq_dec.
+    omega.
+  - specialize (IHxs ltac:(eauto) ltac:(eauto)).
+    break_if; subst; simpl; omega.
 Qed.
 
 Lemma subset_length :
@@ -751,19 +684,17 @@ Proof.
   induction xs; intros.
   - simpl. omega.
   - specialize (IHxs (remove X a ys) X).
-    invc H.
+    invc_NoDup.
     concludes.
 
     forward IHxs.
     intros.
-    apply remove_preserve.
-    intro. subst. congruence.
-
-    apply H0. intuition.
+    apply remove_preserve; [congruence|intuition].
     concludes.
+
     pose proof remove_length_lt a ys X.
-    forwards.
-    apply H0. intuition. concludes.
+    conclude_using intuition.
+
     simpl. omega.
 Qed.
 
@@ -771,15 +702,14 @@ Lemma take_length_ge : forall A n m (xs : list A),
                          length (take n xs) >= m ->
                          length xs >= m.
 Proof.
-  induction n; intros.
-  - simpl in *. omega.
-  - simpl in *. break_match.
+  induction n; intros; simpl in *.
+  - omega.
+  - break_match.
     + omega.
     + simpl in *.
       destruct m; try omega.
       unfold ge in *.
-      apply le_S_n in H.
-      apply IHn in H. omega.
+      auto with arith.
 Qed.
 
 Fixpoint fin (n : nat) : Type :=
@@ -792,13 +722,8 @@ Lemma fin_eq_dec : forall n (a b : fin n), {a = b} + {a <> b}.
 Proof.
   induction n.
   - auto.
-  - intros. destruct a, b.
-    + specialize (IHn f f0). intuition.
-      * subst. auto.
-      * right. intros. inversion H. auto.
-    + right. discriminate.
-    + right. discriminate.
-    + auto.
+  - intros. destruct a, b; intuition (auto; try discriminate).
+    specialize (IHn f f0). intuition congruence.
 Qed.
 
 Fixpoint all_fin (n : nat) : list (fin n) :=
@@ -1031,49 +956,30 @@ Proof.
   repeat (break_if; subst; simpl in *; try congruence).
 Qed.
 
+Lemma In_filter_In :
+  forall A (f : A -> bool) x l l',
+    filter f l = l' ->
+    In x l' -> In x l.
+Proof.
+  intros. subst.
+  eapply filter_In; eauto.
+Qed.
+
 Lemma filter_partition :
   forall A (l1 : list A) f l2 x l1' l2',
     NoDup (l1 ++ x :: l2) ->
     filter f (l1 ++ x :: l2) = (l1' ++ x :: l2') ->
     filter f l1 = l1' /\ filter f l2 = l2'.
 Proof.
-  induction l1; intros; simpl in *.
-  - break_if; simpl in *.
-    + invcs H.
-      destruct l1'; simpl in *; intuition.
-      * solve_by_inversion.
-      * find_inversion.
-        exfalso.
-        match goal with
-          | H : filter ?f ?l = _ ++ ?x :: _ |- _ =>
-            assert (In x (filter f l)) by (repeat find_rewrite; in_crush)
-        end.
-        find_apply_lem_hyp filter_In. intuition.
-      * find_inversion.
-        exfalso.
-        match goal with
-          | H : filter ?f ?l = _ ++ ?x :: _ |- _ =>
-            assert (In x (filter f l)) by (repeat find_rewrite; in_crush)
-        end.
-        find_apply_lem_hyp filter_In. intuition.
-    + exfalso.
-      match goal with
-        | H : filter ?f ?l = _ ++ ?x :: _ |- _ =>
-          assert (In x (filter f l)) by (repeat find_rewrite; in_crush)
-      end.
-      find_apply_lem_hyp filter_In. intuition. congruence.
-  - break_if.
-    + invcs H.
-      destruct l1'; simpl in *; intuition;
-      try solve [
-            find_inversion; exfalso;
-            match goal with
-              | _ : In ?x ?l -> False |- _ =>
-                assert (In x l) by in_crush; intuition
-            end|
-            find_inversion; f_equal;
-            find_apply_hyp_hyp; intuition].
-    + invcs H. eauto.
+  induction l1; intros; simpl in *; break_if; simpl in *; invc_NoDup.
+  - destruct l1'; simpl in *.
+    + solve_by_inversion.
+    + find_inversion. exfalso. eauto using In_filter_In with *.
+  - exfalso. eauto using In_filter_In with *.
+  - destruct l1'; simpl in *; break_and; find_inversion.
+    + exfalso. eauto with *.
+    + find_apply_hyp_hyp. intuition auto using f_equal2.
+  - eauto.
 Qed.
 
 Lemma map_inverses :
@@ -1183,11 +1089,10 @@ Section assoc.
   Proof.
     induction l; intros; simpl in *.
     - auto.
-    - invc H.
-      repeat break_match; subst.
-      + simpl in *. apply not_in_assoc. auto.
-      + simpl in *. break_if; try congruence.
-        auto.
+    - invc_NoDup.
+      repeat break_match; subst; simpl in *.
+      + apply not_in_assoc. auto.
+      + break_if; try congruence. auto.
   Qed.
 
   Lemma get_del_diff :
@@ -1278,10 +1183,9 @@ Definition before_func_dec :
   forall A f g (l : list A),
     {before_func f g l} + {~ before_func f g l}.
 Proof.
-  intros. induction l.
-  - simpl in *. intuition.
-  - simpl in *.
-    destruct (f a); destruct (g a); intuition.
+  intros. induction l; simpl in *.
+  - intuition.
+  - destruct (f a); destruct (g a); intuition.
 Qed.
 
 Lemma before_func_app :
@@ -1560,11 +1464,14 @@ Lemma NoDup_rev :
     NoDup (A:=A) l ->
     NoDup (rev l).
 Proof.
-  induction l; intros.
-  - simpl. auto.
-  - simpl. apply NoDup_append.
-    invc H. constructor; auto.
-    intro. apply H2. apply in_rev. auto.
+  induction l; intros; simpl.
+  - auto.
+  - apply NoDup_append.
+    invc_NoDup.
+    constructor; auto.
+    intuition.
+    find_apply_lem_hyp in_rev.
+    auto.
 Qed.
 
 Lemma NoDup_map_map :
@@ -1575,15 +1482,13 @@ Lemma NoDup_map_map :
 Proof.
   induction xs; intros; simpl in *.
   - constructor.
-  - invc H0.
-    constructor.
-    + intro.
-      apply H3.
-      do_in_map.
-      find_apply_hyp_hyp.
-      rewrite <- H0.
-      auto using in_map.
-    + auto.
+  - invc_NoDup.
+    constructor; auto.
+    intro.
+    do_in_map.
+    find_apply_hyp_hyp.
+    find_reverse_rewrite.
+    auto using in_map.
 Qed.
 
 Lemma plus_gt_0 :
@@ -1658,11 +1563,7 @@ Section remove_all.
       In x l ->
       In x (remove_all ds l).
   Proof.
-    induction ds; intros; simpl in *.
-    - auto.
-    - apply IHds.
-      + intuition.
-      + apply remove_preserve; intuition.
+    induction ds; intros; simpl in *; intuition auto using remove_preserve.
   Qed.
 End remove_all.
 Arguments in_remove_all_was_in : clear implicits.
@@ -1678,7 +1579,7 @@ Lemma filterMap_NoDup_inj :
 Proof.
   induction l; intros.
   - constructor.
-  - simpl. invc H0.
+  - simpl. invc_NoDup.
     break_match; auto.
     constructor; auto.
     intro.
@@ -1692,9 +1593,9 @@ Lemma subseq_remove_all :
     subseq l l' ->
     subseq (remove_all A_eq_dec ds l) l'.
 Proof.
-  induction ds; intros.
-  - simpl. auto.
-  - simpl. apply IHds.
+  induction ds; intros; simpl.
+  - auto.
+  - apply IHds.
     eapply subseq_trans.
     apply subseq_remove.
     auto.
