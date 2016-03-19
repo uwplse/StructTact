@@ -20,6 +20,8 @@ Ltac do_in_app :=
     | [ H : In _ (_ ++ _) |- _ ] => apply in_app_iff in H
   end.
 
+Create HintDb struct_util.
+
 Lemma filter_app : forall A (f : A -> bool) xs ys,
     filter f (xs ++ ys) = filter f xs ++ filter f ys.
 Proof.
@@ -33,7 +35,7 @@ Ltac invc_NoDup :=
   | [ H : NoDup (_ :: _) |- _ ] => invc H
   end.
 
-Hint Constructors NoDup.
+Hint Constructors NoDup : struct_util.
 
 Section dedup.
   Variable A : Type.
@@ -591,9 +593,9 @@ Lemma take_NoDup : forall A n (xs : list A),
                      NoDup xs ->
                      NoDup (take n xs).
 Proof.
-  induction n; intros; simpl; destruct xs; auto.
+  induction n; intros; simpl; destruct xs; auto with struct_util.
   invc_NoDup.
-  eauto 6 using in_take.
+  eauto 6 using in_take with struct_util.
 Qed.
 
 Lemma remove_NoDup :
@@ -602,8 +604,8 @@ Lemma remove_NoDup :
     NoDup (remove A_eq_dec x xs).
 Proof.
   induction xs; intros.
-  - auto.
-  - invc_NoDup. simpl. break_if; eauto 6 using in_remove.
+  - auto with struct_util.
+  - invc_NoDup. simpl. break_if; eauto 6 using in_remove with struct_util.
 Qed.
 
 Lemma seq_range :
@@ -936,7 +938,7 @@ Lemma app_cons_in :
 Proof.
   intros. subst. auto with *.
 Qed.
-Hint Resolve app_cons_in.
+Hint Resolve app_cons_in : struct_util.
 
 Lemma app_cons_in_rest:
   forall A (l : list A) xs a b ys,
@@ -946,7 +948,7 @@ Lemma app_cons_in_rest:
 Proof.
   intros. subst. in_crush.
 Qed.
-Hint Resolve app_cons_in_rest.
+Hint Resolve app_cons_in_rest : struct_util.
 
 Lemma remove_filter_commute :
   forall A  (l : list A) A_eq_dec f x,
