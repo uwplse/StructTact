@@ -1,6 +1,7 @@
 # StructTact
-StructTact is a library of "structural tactics" (`StructTactics.v`) and
-a library of lemmas about lists (`Util.v`) that uses the tactics library.
+StructTact is a library of "structural tactics" (`StructTactics.v`) as well as
+libraries containing lemmas about lists (`Util.v`) and finite types (`Fin.v`)
+that use the tactics library.
 These files were originally developed in the context of [Verdi](http://github.com/uwplse/verdi),
 but have since been factored out to make them easier to use in other projects.
 
@@ -27,9 +28,19 @@ projects. Most of the file consists of the following definitions and associated 
 * association lists: get, set, delete
 * `dedup`: remove duplicates from a list using decidable equality
 * `subseq`: relation capturing when one list is a subsequence of another
-* `fin`: an alternative definition of a type isomorphic to `Fin.t`
 * `Prefix`: relation capturing when one list is a prefix of another
 * `filterMap`: useful helper function that maps a partial function and ignores failures
 * `before`: relation capturing when an element appears before another in a list
 * `remove_all`: removes all elements of one list from another; set subtraction
 
+## Fin
+This file contains an definitions and lemmas related to `fin n`, a type with `n` elements,
+isomorphic to `Fin.t n` from the standard library, but with a slightly different
+definition that is more convenient to work with.
+The following constructions are defined on `fin`:
+* `fin_eq_dec`: decidable equality
+* `all_fin n`: list of all elements of `fin n`
+* `fin_to_nat`: convert a `fin n` to a `nat`
+* `fin_lt`: an ordering on `fin n`, implemented using `fin_to_nat`
+* implementations of `OrderedType` of both kinds: legacy (for use with `FMap`) and new
+  (for use with `MSet`)

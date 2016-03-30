@@ -714,43 +714,6 @@ Proof.
       auto with arith.
 Qed.
 
-Fixpoint fin (n : nat) : Type :=
-  match n with
-    | 0 => False
-    | S n' => option (fin n')
-  end.
-
-Lemma fin_eq_dec : forall n (a b : fin n), {a = b} + {a <> b}.
-Proof.
-  induction n.
-  - auto.
-  - intros. destruct a, b; intuition (auto; try discriminate).
-    specialize (IHn f f0). intuition congruence.
-Qed.
-
-Fixpoint all_fin (n : nat) : list (fin n) :=
-  match n with
-    | 0 => []
-    | S n' => None :: map (fun x => Some x) (all_fin n')
-  end.
-
-Lemma all_fin_all :
-  forall n (x : fin n),
-    In x (all_fin n).
-Proof.
-  induction n; intros.
-  - solve_by_inversion.
-  - simpl in *. destruct x; auto using in_map.
-Qed.
-
-Lemma all_fin_NoDup :
-  forall n,
-    NoDup (all_fin n).
-Proof.
-  induction n; intros; simpl; constructor.
-  - intro. apply in_map_iff in H. firstorder. discriminate.
-  - apply NoDup_map_injective; auto. congruence.
-Qed.
 
 Lemma or_false :
   forall P : Prop, P -> (P \/ False).
