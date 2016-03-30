@@ -1,6 +1,3 @@
-Require Import Arith.
-Require Import Omega.
-Require Import NPeano.
 Require Import List.
 Import ListNotations.
 Require Import StructTact.StructTactics.
