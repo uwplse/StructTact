@@ -1007,7 +1007,7 @@ Section assoc.
       | [] => []
       | (k', v') :: l' =>
         if K_eq_dec k k' then
-          l'
+          assoc_del l' k
         else
           (k', v') :: (assoc_del l' k)
     end.
@@ -1049,15 +1049,12 @@ Section assoc.
 
   Lemma get_del_same :
     forall k l,
-      NoDup (map (@fst _ _) l) ->
       assoc (assoc_del l k) k = None.
   Proof.
     induction l; intros; simpl in *.
     - auto.
-    - invc_NoDup.
-      repeat break_match; subst; simpl in *.
-      + apply not_in_assoc. auto.
-      + break_if; try congruence. auto.
+    - repeat break_match; subst; simpl in *; auto.
+      break_if; try congruence.
   Qed.
 
   Lemma get_del_diff :
@@ -1067,8 +1064,7 @@ Section assoc.
   Proof.
     induction l; intros; simpl in *.
     - auto.
-    - repeat (break_match; simpl); subst; try congruence.
-      auto.
+    - repeat (break_match; simpl); subst; try congruence; auto.
   Qed.
 
   Lemma get_set_diff_default :
