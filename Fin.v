@@ -12,13 +12,31 @@ Fixpoint fin (n : nat) : Type :=
     | S n' => option (fin n')
   end.
 
-Lemma fin_eq_dec : forall n (a b : fin n), {a = b} + {a <> b}.
-Proof.
-  induction n.
+Definition fin_eq_dec :
+  forall n (a b : fin n), {a = b} + {a <> b}.
+refine
+  (fun n => nat_rect
+    (fun n0 => forall a b : fin n0, {a = b} + {a <> b})
+    (fun a b : fin 0 => right _)
+    (fun n H_dec =>
+       fun a b =>
+         match a, b with
+           | Some a', Some b' =>
+             match H_dec a' b' with
+               | left _ _ => left _
+               | right _ _ => right _
+             end
+           | Some a', None => right _
+           | None, Some b' => right _
+           | None, None => left eq_refl
+         end)
+    _).
   - auto.
-  - intros. destruct a, b; intuition (auto; try discriminate).
-    specialize (IHn f f0). intuition congruence.
-Qed.
+  - congruence.
+  - congruence.
+  - discriminate.
+  - discriminate.
+Defined.
 
 Fixpoint all_fin (n : nat) : list (fin n) :=
   match n with
@@ -110,19 +128,19 @@ Qed.
 
 Fixpoint fin_compare (n : nat) : forall (x y : fin n), Compare fin_lt eq x y :=
   match n with
-  | 0 => fun x y : fin 0 => match x with end
-  | S n' => fun x y : fin (S n') =>
-             match x, y with
-             | Some x', Some y' =>
-               match fin_compare n' x' y' with
-               | LT pf => LT (fin_lt_Some_intro pf)
-               | EQ pf => EQ (f_equal _ pf)
-               | GT pf => GT (fin_lt_Some_intro pf)
+    | 0 => fun x y : fin 0 => match x with end
+    | S n' => fun x y : fin (S n') =>
+               match x, y with
+                 | Some x', Some y' =>
+                   match fin_compare n' x' y' with
+                     | LT pf => LT (fin_lt_Some_intro pf)
+                     | EQ pf => EQ (f_equal _ pf)
+                     | GT pf => GT (fin_lt_Some_intro pf)
+                   end
+                 | Some x', None => GT (None_lt_Some n' x')
+                 | None, Some y' => LT (None_lt_Some n' y')
+                 | None, None => EQ eq_refl
                end
-             | Some x', None => GT (None_lt_Some n' x')
-             | None, Some y' => LT (None_lt_Some n' y')
-             | None, None => EQ eq_refl
-             end
   end.
 
 Module Type NatValue.
@@ -148,13 +166,8 @@ Lemma fin_lt_irrefl :
   forall n, Irreflexive (@fin_lt n).
 Proof.
   intros.
-  unfold Irreflexive.
-  unfold complement.
-  unfold Reflexive.
-  unfold fin_lt.
-  intros x H.
-  contradict H.
-  auto with arith.
+  unfold Irreflexive, complement, Reflexive, fin_lt.
+  intuition.
 Qed.
 
 Lemma fin_lt_strorder : forall n, StrictOrder (@fin_lt n).
@@ -166,16 +179,7 @@ Qed.
 Lemma fin_lt_lt_compat : 
   forall n, Proper (eq ==> eq ==> iff) (@fin_lt n).
 Proof.
-  intros.
-  split.
-  - intros.
-    rewrite H in H1.
-    rewrite H0 in H1.
-    assumption.
-  - intros.
-    rewrite H.
-    rewrite H0.
-    assumption.
+  intros; split; intros; repeat find_rewrite; assumption.
 Qed.
 
 Lemma CompSpec_Eq_Some : 
@@ -185,8 +189,7 @@ Lemma CompSpec_Eq_Some :
 Proof.
   intros.
   apply f_equal.
-  inversion H.
-  trivial.
+  solve_by_inversion.
 Qed.
 
 Lemma CompSpec_Lt : 
@@ -195,8 +198,7 @@ Lemma CompSpec_Lt :
     fin_lt x' y'.
 Proof.
   intros.
-  inversion H.
-  trivial.
+  solve_by_inversion.
 Qed.
 
 Lemma CompSpec_Gt : 
@@ -205,24 +207,24 @@ Lemma CompSpec_Gt :
     fin_lt y' x'.
 Proof.
   intros.
-  inversion H.
-  trivial.
+  solve_by_inversion.
 Qed.
 
-Fixpoint fin_comparison_dec (n : nat) : forall (x y : fin n), { cmp : comparison | CompSpec eq fin_lt x y cmp } :=
+Fixpoint fin_comparison_dec (n : nat) :
+  forall (x y : fin n), { cmp : comparison | CompSpec eq fin_lt x y cmp } :=
   match n with
-  | 0 => fun x y : fin 0 => match x with end
-  | S n' => fun x y : fin (S n') =>
+    | 0 => fun x y : fin 0 => match x with end
+    | S n' => fun x y : fin (S n') =>
              match x, y with
-             | Some x', Some y' =>
-               match fin_comparison_dec n' x' y' with
-               | exist _ Lt Hc => exist _ Lt (CompLt _ _ (fin_lt_Some_intro (CompSpec_Lt Hc)))
-               | exist _ Eq Hc => exist _ Eq (CompEq _ _ (CompSpec_Eq_Some Hc))
-               | exist _ Gt Hc => exist _ Gt (CompGt _ _ (fin_lt_Some_intro (CompSpec_Gt Hc)))
-               end
-             | Some x', None => exist _ Gt (CompGt _ _ (None_lt_Some n' x'))
-             | None, Some y' => exist _ Lt (CompLt _ _ (None_lt_Some n' y'))
-             | None, None => exist _ Eq (CompEq _ _ eq_refl)
+               | Some x', Some y' =>
+                 match fin_comparison_dec n' x' y' with
+                   | exist _ Lt Hc => exist _ Lt (CompLt _ _ (fin_lt_Some_intro (CompSpec_Lt Hc)))
+                   | exist _ Eq Hc => exist _ Eq (CompEq _ _ (CompSpec_Eq_Some Hc))
+                   | exist _ Gt Hc => exist _ Gt (CompGt _ _ (fin_lt_Some_intro (CompSpec_Gt Hc)))
+                 end
+               | Some x', None => exist _ Gt (CompGt _ _ (None_lt_Some n' x'))
+               | None, Some y' => exist _ Lt (CompLt _ _ (None_lt_Some n' y'))
+               | None, None => exist _ Eq (CompEq _ _ eq_refl)
              end
   end.
 
@@ -234,8 +236,7 @@ Lemma fin_compare_spec : forall (n : nat) (x y : fin n),
 Proof.
   intros.
   unfold fin_comparison.
-  case fin_comparison_dec.
-  intros.
+  break_match.
   assumption.
 Qed.
 
