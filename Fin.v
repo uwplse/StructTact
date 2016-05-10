@@ -12,31 +12,51 @@ Fixpoint fin (n : nat) : Type :=
     | S n' => option (fin n')
   end.
 
-Definition fin_eq_dec :
-  forall n (a b : fin n), {a = b} + {a <> b}.
-refine
-  (fun n => nat_rect
-    (fun n0 => forall a b : fin n0, {a = b} + {a <> b})
-    (fun a b : fin 0 => right _)
-    (fun n H_dec =>
-       fun a b =>
-         match a, b with
-           | Some a', Some b' =>
-             match H_dec a' b' with
-               | left _ _ => left _
-               | right _ _ => right _
-             end
-           | Some a', None => right _
-           | None, Some b' => right _
-           | None, None => left eq_refl
-         end)
-    _).
-  - auto.
-  - congruence.
-  - congruence.
-  - discriminate.
-  - discriminate.
-Defined.
+Lemma fin_eq_Some :
+  forall n (a b : fin n),
+    a = b ->
+    Some a = Some b.
+Proof.
+  congruence.
+Qed.
+
+Lemma fin_neq_Some :
+  forall n (a b : fin n),
+    a <> b ->
+    Some a <> Some b.
+Proof.
+  congruence.
+Qed.
+
+Lemma fin_neq_Some_None :
+  forall n (a : fin n),
+    Some a <> None.
+Proof.
+  discriminate.
+Qed.
+
+Lemma fin_neq_None_Some :
+  forall n (a : fin n),
+    None <> Some a.
+Proof.
+  discriminate.
+Qed.
+
+Fixpoint fin_eq_dec (n : nat) : forall (a b : fin n), {a = b} + {a <> b} :=
+  match n with
+    | 0 => fun a b : fin 0 => right (match b with end)
+    | S n' => fun a b : fin (S n') =>
+               match a, b with
+                 | Some a', Some b' =>
+                   match fin_eq_dec n' a' b' with
+                     | left _ H => left (fin_eq_Some n' H)
+                     | right _ H => right (fin_neq_Some n' H)
+                   end
+                 | Some a', None => right (@fin_neq_Some_None n' a')
+                 | None, Some b' => right (@fin_neq_None_Some n' b')
+                 | None, None => left eq_refl
+               end
+  end.
 
 Fixpoint all_fin (n : nat) : list (fin n) :=
   match n with
