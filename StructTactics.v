@@ -365,7 +365,7 @@ Ltac find_false :=
   end.
 
 Ltac injc H :=
-  injection H; clear H; intro; subst_max.
+  injection H; clear H; intros; subst_max.
 
 Ltac find_injection :=
   match goal with
@@ -377,7 +377,7 @@ Ltac find_injection :=
     | [ H : ?X _ = ?X _ |- _ ] => injc H
   end.
 
-Ltac aggresive_rewrite_goal :=
+Ltac aggressive_rewrite_goal :=
   match goal with H : _ |- _ => rewrite H end.
 
 Ltac break_exists_name x :=
