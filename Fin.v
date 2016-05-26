@@ -242,3 +242,26 @@ Module fin_OT (N : NatValue) <: OrderedType.
   Definition compare_spec := fin_compare_spec N.n.
   Definition eq_dec := fin_eq_dec N.n.
 End fin_OT.
+
+Fixpoint fin_of_nat (m n : nat) : fin n + {exists p, m = n + p} :=
+  match n as n0 return fin n0 + {exists p, m = n0 + p} with
+  | 0 => inright (ex_intro _ m eq_refl)
+  | S n' =>
+    match m as m0 return fin (S n') + {exists p, m0 = (S n') + p} with
+    | 0 => inleft None
+    | S m' =>
+      match fin_of_nat m' n' with
+      | inleft f => inleft (Some f)
+      | inright pf => inright (let 'ex_intro _ x H := pf in
+                              ex_intro _ x (f_equal S H))
+      end
+    end
+  end.
+
+Lemma fin_of_nat_fin_to_nat:
+  forall (n : nat) (a : fin n), fin_of_nat (fin_to_nat a) n = inleft a.
+Proof.
+  induction n; simpl; intuition.
+  destruct a; simpl in *; auto.
+  now rewrite IHn.
+Qed.
