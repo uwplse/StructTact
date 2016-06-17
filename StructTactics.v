@@ -42,6 +42,26 @@ Ltac break_match_goal :=
 
 Ltac break_match := break_match_goal || break_match_hyp.
 
+Ltac break_inner_match' t :=
+ match t with
+   | context[match ?X with _ => _ end] =>
+     break_inner_match' X || destruct X eqn:?
+   | _ => destruct t eqn:?
+ end.
+
+Ltac break_inner_match_goal :=
+ match goal with
+   | [ |- context[match ?X with _ => _ end] ] =>
+     break_inner_match' X
+ end.
+
+Ltac break_inner_match_hyp :=
+ match goal with
+   | [ H : context[match ?X with _ => _ end] |- _ ] =>
+     break_inner_match' X
+ end.
+
+Ltac break_inner_match := break_inner_match_goal || break_inner_match_hyp.
 
 Ltac break_exists :=
   repeat match goal with
