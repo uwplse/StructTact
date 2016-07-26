@@ -23,15 +23,21 @@ style of proof where hypothesis names are never mentioned. When automatically
 generated names change during proof development, structural tactics still work.
 
 ## Util
-This file contains definitions and lemmas about lists that were useful in other
-projects. Most of the file consists of the following definitions and associated lemmas.
-* association lists: get, set, delete
-* `dedup`: remove duplicates from a list using decidable equality
-* `subseq`: relation capturing when one list is a subsequence of another
-* `Prefix`: relation capturing when one list is a prefix of another
-* `filterMap`: useful helper function that maps a partial function and ignores failures
-* `before`: relation capturing when an element appears before another in a list
-* `remove_all`: removes all elements of one list from another; set subtraction
+This file collects definitions and lemmas about lists, booleans, and propositions
+that were useful in other projects. Notably, the following files are exported:
+* BoolUtil: general boolean lemmas, tactics, and definitions
+* PropUtil: general lemmas about propositions and sum types
+* ListTactics: tactics operating on contexts with `map`, `NoDup`, and `In`
+* ListUtil: general list lemmas, involving, e.g., `NoDup`, `map`, and `filter`
+* Assoc: association lists with get, set, and delete functions
+* Before: relation `before` capturing when an element appears before another in a list
+* Dedup: function `dedup` remove duplicates from a list using decidable equality
+* FilterMap: function `filterMap` that maps a partial function on a list and ignores failures
+* Nth: relation `Nth` capturing the element at some position in a list
+* Prefix: relation `Prefix` capturing when one list is a prefix of another
+* RemoveAll: function `remove_all` which removes all elements of one list from another; set subtraction
+* Subseq: relation `subseq` capturing when one list is a subsequence of another
+* Take: function `take` returning a prefix of some given size of a list
 
 ## Fin
 This file contains an definitions and lemmas related to `fin n`, a type with `n` elements,
