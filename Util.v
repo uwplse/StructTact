@@ -13,3 +13,5 @@ Require Export StructTact.Take.
 
 Require Export StructTact.BoolUtil.
 Require Export StructTact.PropUtil.
+
+Require Export StructTact.Update.
