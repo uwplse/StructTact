@@ -85,11 +85,18 @@ Proof.
     repeat first [rewrite update_diff by congruence |
                   rewrite update_eq  by auto ]; auto.
 Qed.
- 
-Ltac update_destruct :=
+
+Ltac update_destruct_goal :=
   match goal with
-  | [ |- context [ update ?eq_dec _ ?y _ ?x ] ] => destruct (eq_dec y x)
+    | [ |- context [ update ?eq_dec _ ?y _ ?x ] ] => destruct (eq_dec y x)
   end.
+
+Ltac update_destruct_hyp :=
+  match goal with
+    | [ _ : context [ update ?eq_dec _ ?y _ ?x ] |- _ ] => destruct (eq_dec y x)
+  end.
+
+Ltac update_destruct := update_destruct_goal || update_destruct_hyp.
 
 Ltac rewrite_update' H :=
   first [rewrite update_diff in H by congruence |
@@ -102,3 +109,18 @@ Ltac rewrite_update :=
            | [ |- _ ] => repeat (try rewrite update_diff by congruence;
                                  try rewrite update_eq by auto)
          end.
+
+Ltac destruct_update :=
+  repeat (update_destruct; subst; rewrite_update).
+
+Ltac destruct_update_hyp :=
+  repeat ((update_destruct_hyp || update_destruct_goal); subst; rewrite_update).
+
+Ltac update_destruct_simplify :=
+  update_destruct; subst; rewrite_update; simpl in *.
+
+Ltac update_destruct_simplify_hyp :=
+  update_destruct_hyp || update_destruct_goal; subst; rewrite_update; simpl in *.
+
+Ltac update_destruct_max_simplify :=
+  update_destruct; subst_max; rewrite_update; simpl in *.
