@@ -679,4 +679,19 @@ Section list_util.
     apply map_ext.
     destruct a; auto.
   Qed.
+
+  Lemma in_firstn : forall n (x : A) xs,
+      In x (firstn n xs) -> In x xs.
+  Proof.
+    induction n; simpl; intuition; break_match; simpl in *; intuition.
+  Qed.
+
+  Lemma firstn_NoDup : forall n (xs : list A),
+      NoDup xs ->
+      NoDup (firstn n xs).
+  Proof.
+    induction n; intros; simpl; destruct xs; auto with struct_util.
+    invc_NoDup.
+    eauto 6 using in_firstn with struct_util.
+  Qed.
 End list_util.
