@@ -28,7 +28,7 @@ that were useful in other projects. Notably, the following files are exported:
 * BoolUtil: general boolean lemmas, tactics, and definitions
 * PropUtil: general lemmas about propositions and sum types
 * ListTactics: tactics operating on contexts with `map`, `NoDup`, and `In`
-* ListUtil: general list lemmas, involving, e.g., `NoDup`, `map`, and `filter`
+* ListUtil: general list lemmas, involving, e.g., `NoDup`, `map`, `filter`, and `firstn`
 * Assoc: association lists with get, set, and delete functions
 * Before: relation `before` capturing when an element appears before another in a list
 * Dedup: function `dedup` remove duplicates from a list using decidable equality
@@ -37,7 +37,6 @@ that were useful in other projects. Notably, the following files are exported:
 * Prefix: relation `Prefix` capturing when one list is a prefix of another
 * RemoveAll: function `remove_all` which removes all elements of one list from another; set subtraction
 * Subseq: relation `subseq` capturing when one list is a subsequence of another
-* Take: function `take` returning a prefix of some given size of a list
 
 ## Fin
 This file contains an definitions and lemmas related to `fin n`, a type with `n` elements,
@@ -48,5 +47,6 @@ The following constructions are defined on `fin`:
 * `all_fin n`: list of all elements of `fin n`
 * `fin_to_nat`: convert a `fin n` to a `nat`
 * `fin_lt`: an ordering on `fin n`, implemented using `fin_to_nat`
-* implementations of `OrderedType` of both kinds: legacy (for use with `FMap`) and new
-  (for use with `MSet`)
+* `fin_OT_compat`: legacy `OrderedType` module for `fin n` (for use with `FMap`)
+* `fin_OT`: modern `OrderedType` module for `fin n` (for use with `MSet`)
+* `fin_of_nat`: convert a `nat` to a `fin n`, when possible
