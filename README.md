@@ -23,10 +23,11 @@ style of proof where hypothesis names are never mentioned. When automatically
 generated names change during proof development, structural tactics still work.
 
 ## Util
-This file collects definitions and lemmas about lists, booleans, and propositions
-that were useful in other projects. Notably, the following files are exported:
+This file collects definitions, lemmas, and tactics about lists, booleans, propositions, and
+functions that were useful in other projects. Notably, the following files are exported:
 * BoolUtil: general boolean lemmas, tactics, and definitions
 * PropUtil: general lemmas about propositions and sum types
+* Update: function `update` that modifies a function to return a new value for a specific argument
 * ListTactics: tactics operating on contexts with `map`, `NoDup`, and `In`
 * ListUtil: general list lemmas, involving, e.g., `NoDup`, `map`, `filter`, and `firstn`
 * Assoc: association lists with get, set, and delete functions
