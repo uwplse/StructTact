@@ -8,6 +8,13 @@ but have since been factored out to make them easier to use in other projects.
 If you are interested in using StructTact in a project that does not already
 manage its dependencies, we recommend using [`coqproject.sh`](https://github.com/dwoos/coqproject).
 
+## Build Instructions
+
+```
+./configure
+make
+```
+
 ## Structural Tactics
 Structural tactics are named by analogy to the structural properties of
 simple type systems: weakening, exchange, and contraction.
