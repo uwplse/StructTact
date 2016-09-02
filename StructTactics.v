@@ -80,6 +80,11 @@ Ltac break_and :=
            | [H : _ /\ _ |- _ ] => destruct H
          end.
 
+Ltac break_and_goal :=
+    repeat match goal with
+             | [ |- _ /\ _ ] => split
+           end.
+
 Ltac solve_by_inversion' tac :=
   match goal with
     | [H : _ |- _] => solve [inv H; tac]
