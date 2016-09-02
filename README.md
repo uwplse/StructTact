@@ -1,6 +1,6 @@
 # StructTact
-StructTact is a library of "structural tactics" (`StructTactics.v`) as well as
-libraries containing lemmas about lists (`Util.v`) and finite types (`Fin.v`)
+StructTact is a Coq library of "structural tactics" (`StructTactics.v`) as well as
+Coq libraries containing lemmas about lists (`Util.v`) and finite types (`Fin.v`)
 that use the tactics library.
 These files were originally developed in the context of [Verdi](http://github.com/uwplse/verdi),
 but have since been factored out to make them easier to use in other projects.
@@ -8,12 +8,28 @@ but have since been factored out to make them easier to use in other projects.
 If you are interested in using StructTact in a project that does not already
 manage its dependencies, we recommend using [`coqproject.sh`](https://github.com/dwoos/coqproject).
 
+## Requirements
+
+[`Coq 8.5`](https://coq.inria.fr/download)
+
 ## Build Instructions
 
 ```
 ./configure
 make
 ```
+
+## Usage
+
+The default namespace for the library files is `StructTact`. Hence, a Coq development
+using structural tactics typically includes
+
+```
+Require Import StructTact.StructTactics.
+```
+
+The optional utility and finite type definitions and lemmas described below must be included
+separately.
 
 ## Structural Tactics
 Structural tactics are named by analogy to the structural properties of
