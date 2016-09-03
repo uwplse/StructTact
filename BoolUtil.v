@@ -42,10 +42,10 @@ Ltac do_bool :=
     | [ H : PeanoNat.Nat.ltb _ _ = false |- _ ] => apply ltb_false_le in H
     | [ H : leb _ _ = true |- _ ] => apply leb_true_le in H
     | [ H : leb _ _ = false |- _ ] => apply leb_false_lt in H
-    | [ |- context [ andb _ _ ] ] => apply Bool.andb_true_iff
-    | [ |- context [ andb _ _ ] ] => apply Bool.andb_false_iff
-    | [ |- context [ leb _ _ ] ] => apply leb_correct
-    | [ |- context [ _ <> false ] ] => apply Bool.not_false_iff_true
+    | [ |- andb _ _ = true ]=> apply Bool.andb_true_iff
+    | [ |- andb _ _ = false ] => apply Bool.andb_false_iff
+    | [ |- leb _ _ = true ] => apply leb_correct
+    | [ |-  _ <> false ] => apply Bool.not_false_iff_true
     | [ |- beq_nat _ _ = false ] => apply beq_nat_false_iff
     | [ |- beq_nat _ _ = true ] => apply beq_nat_true_iff
   end.
