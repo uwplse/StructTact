@@ -22,7 +22,7 @@ Section dedup.
 
   Lemma dedup_eliminates_duplicates : forall (a : A) b c,
       (dedup (a :: b ++ a :: c) = dedup (b ++ a :: c)).
-  Proof.
+  Proof using.
     intros. simpl in *.
     break_match.
     + auto.
@@ -32,7 +32,7 @@ Section dedup.
   Lemma dedup_In : forall (x : A) xs,
       In x xs ->
       In x (dedup xs).
-  Proof.
+  Proof using.
     induction xs; intros; simpl in *.
     - intuition.
     - break_if; intuition; subst; simpl; auto.
@@ -42,7 +42,7 @@ Section dedup.
     forall xs (p : A) ys,
       pred p = false ->
       filter pred (dedup (xs ++ ys)) = filter pred (dedup (xs ++ p :: ys)).
-  Proof.
+  Proof using.
     intros.
     induction xs; simpl; repeat (break_match; simpl);
       auto using f_equal2; try discriminate.
@@ -54,7 +54,7 @@ Section dedup.
   Lemma dedup_app : forall (xs ys : list A),
       (forall x y, In x xs -> In y ys -> x <> y) ->
       dedup (xs ++ ys) = dedup xs ++ dedup ys.
-  Proof.
+  Proof using.
     intros. induction xs; simpl; auto.
     repeat break_match.
     - apply IHxs.
@@ -72,7 +72,7 @@ Section dedup.
     forall xs (x : A),
       In x (dedup xs) ->
       In x xs.
-  Proof.
+  Proof using.
     induction xs; intros; simpl in *.
     - intuition.
     - break_if; simpl in *; intuition.
@@ -81,7 +81,7 @@ Section dedup.
   Lemma NoDup_dedup :
     forall (xs : list A),
       NoDup (dedup xs).
-  Proof.
+  Proof using.
     induction xs; simpl.
     - constructor.
     - break_if; auto.
@@ -94,7 +94,7 @@ Section dedup.
   Lemma remove_dedup_comm : forall (x : A) xs,
       remove A_eq_dec x (dedup xs) =
       dedup (remove A_eq_dec x xs).
-  Proof.
+  Proof using.
     induction xs; intros.
     - auto.
     - simpl. repeat (break_match; simpl); auto using f_equal.
@@ -106,7 +106,7 @@ Section dedup.
     forall xs (p : A) ys xs' ys',
       dedup (xs ++ p :: ys) = xs' ++ p :: ys' ->
       remove A_eq_dec p (dedup (xs ++ ys)) = xs' ++ ys'.
-  Proof.
+  Proof using.
     intros xs p ys xs' ys' H.
     f_apply H (remove A_eq_dec p).
     rewrite remove_dedup_comm, remove_partition in *.
@@ -121,7 +121,7 @@ Section dedup.
 
   Lemma dedup_NoDup_id : forall (xs : list A),
       NoDup xs -> dedup xs = xs.
-  Proof.
+  Proof using.
     induction xs; intros.
     - auto.
     - simpl. invc_NoDup. concludes.
@@ -132,7 +132,7 @@ Section dedup.
     forall x xs,
       (~ In x xs) ->
       x :: dedup xs = dedup (x :: xs).
-  Proof.
+  Proof using.
     induction xs; intros.
     - auto.
     - simpl in *. intuition. repeat break_match; intuition.

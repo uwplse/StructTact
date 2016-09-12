@@ -15,7 +15,7 @@ Section nth.
     forall n l (x : A),
       nth_error l n = Some x ->
       Nth l n x.
-  Proof.
+  Proof using.
     induction n; intros; simpl in *; auto.
     - break_match; try discriminate.
       unfold value in *.
@@ -30,7 +30,7 @@ Section nth.
     forall n l (x : A),
       Nth l n x ->
       nth_error l n = Some x.
-  Proof.
+  Proof using.
     intros.
     induction H; simpl in *; auto.
   Qed.
