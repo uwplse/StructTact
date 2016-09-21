@@ -20,7 +20,7 @@ Section subseq.
   Hypothesis A_eq_dec : forall x y : A, {x = y} + {x <> y}.
 
   Lemma subseq_refl : forall (l : list A), subseq l l.
-  Proof.
+  Proof using.
     induction l; simpl; tauto.
   Qed.
 
@@ -29,7 +29,7 @@ Section subseq.
       subseq xs ys ->
       subseq ys zs ->
       subseq xs zs.
-  Proof.
+  Proof using.
     induction zs; intros; simpl in *;
       repeat break_match; subst; simpl in *; intuition; subst; eauto;
         right; (eapply IHzs; [|eauto]); simpl; eauto.
@@ -40,7 +40,7 @@ Section subseq.
       subseq xs ys ->
       In x xs ->
       In x ys.
-  Proof.
+  Proof using.
     induction ys; intros.
     - destruct xs; simpl in *; intuition.
     - simpl in *. break_match; simpl in *; intuition; subst; intuition eauto;
@@ -52,7 +52,7 @@ Section subseq.
       subseq xs ys ->
       NoDup ys ->
       NoDup xs.
-  Proof.
+  Proof using.
     induction ys; intros.
     - destruct xs; simpl in *; intuition.
     - simpl in *. invc_NoDup.
@@ -65,7 +65,7 @@ Section subseq.
   Lemma subseq_remove :
     forall (x : A) xs,
       subseq (remove A_eq_dec x xs) xs.
-  Proof.
+  Proof using.
     induction xs; intros; simpl.
     - auto.
     - repeat break_match; auto.
@@ -77,7 +77,7 @@ Section subseq.
     forall (f : A -> B) ys xs,
       subseq xs ys ->
       subseq (map f xs) (map f ys).
-  Proof.
+  Proof using.
     induction ys; intros; simpl in *.
     - repeat break_match; try discriminate; auto.
     - repeat break_match; try discriminate; auto.
@@ -89,7 +89,7 @@ Section subseq.
   Lemma subseq_cons_drop :
     forall xs ys (a : A),
       subseq (a :: xs) ys -> subseq xs ys.
-  Proof.
+  Proof using.
     induction ys; intros; simpl in *; intuition; break_match; eauto.
   Qed.
 
@@ -97,7 +97,7 @@ Section subseq.
     forall (ys xs : list A),
       subseq xs ys ->
       length xs <= length ys.
-  Proof.
+  Proof using.
     induction ys; intros; simpl in *; break_match; intuition.
     subst. simpl in *. specialize (IHys l). concludes. auto with *.
   Qed.
@@ -107,7 +107,7 @@ Section subseq.
       subseq xs ys ->
       subseq ys xs ->
       xs = ys.
-  Proof.
+  Proof using.
     induction xs; intros; destruct ys; simpl in *;
       intuition eauto using f_equal2, subseq_cons_drop.
     exfalso.
@@ -118,7 +118,7 @@ Section subseq.
   Lemma subseq_filter :
     forall (f : A -> bool) xs,
       subseq (filter f xs) xs.
-  Proof.
+  Proof using.
     induction xs; intros; simpl.
     - auto.
     - repeat break_match; intuition congruence.
@@ -127,7 +127,7 @@ Section subseq.
   Lemma subseq_nil :
     forall xs,
       subseq (A:=A) [] xs.
-  Proof.
+  Proof using.
     destruct xs; simpl; auto.
   Qed.
 
@@ -135,7 +135,7 @@ Section subseq.
     forall a xs ys,
       subseq(A:=A) xs ys ->
       subseq xs (a :: ys).
-  Proof.
+  Proof using.
     induction ys; intros; simpl in *; repeat break_match; intuition.
   Qed.
 
@@ -143,7 +143,7 @@ Section subseq.
     forall (f : B -> option A) ys xs,
       subseq xs ys ->
       subseq (filterMap f xs) (filterMap f ys).
-  Proof.
+  Proof using.
     induction ys; intros; simpl in *; repeat break_match; auto; try discriminate; intuition; subst.
     - simpl. find_rewrite. auto.
     - auto using subseq_skip.
@@ -154,7 +154,7 @@ Section subseq.
   Lemma subseq_app_r :
     forall xs ys,
       subseq (A:=A) ys (xs ++ ys).
-  Proof.
+  Proof using.
     induction xs; intros; simpl.
     + auto using subseq_refl.
     + break_match.
@@ -166,7 +166,7 @@ Section subseq.
     forall ys xs zs,
       subseq (A:=A) xs ys ->
       subseq (xs ++ zs) (ys ++ zs).
-  Proof.
+  Proof using.
     induction ys; intros; simpl in *.
     - break_match; intuition auto using subseq_refl.
     - repeat break_match.
@@ -181,21 +181,21 @@ Section subseq.
     forall xs ys zs,
       subseq (A:=A) ys zs ->
       subseq (A:=A) (xs ++ ys) (xs ++ zs).
-  Proof.
+  Proof using.
     induction xs; intros; simpl; intuition.
   Qed.
 
   Lemma subseq_2_3 :
     forall xs ys zs x y,
       subseq(A:=A) (xs ++ ys ++ zs) (xs ++ x :: ys ++ y :: zs).
-  Proof.
+  Proof using.
     auto using subseq_refl, subseq_skip, subseq_app_head.
   Qed.
 
   Lemma subseq_middle :
     forall xs y zs,
       subseq (A:=A) (xs ++ zs) (xs ++ y :: zs).
-  Proof.
+  Proof using.
     intros.
     apply subseq_app_head.
     apply subseq_skip.
@@ -206,7 +206,7 @@ Section subseq.
     forall (ds l l' : list A),
       subseq l l' ->
       subseq (remove_all A_eq_dec ds l) l'.
-  Proof.
+  Proof using.
     induction ds; intros; simpl.
     - auto.
     - apply IHds.

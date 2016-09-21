@@ -27,7 +27,7 @@ Section before.
     forall x y l,
       before (A:=A) x y l ->
       In x l.
-  Proof.
+  Proof using.
     induction l; intros; simpl in *; intuition.
   Qed.
 
@@ -39,7 +39,7 @@ Section before.
       In y l ->
       exists xs ys zs,
         l = xs ++ x :: ys ++ y :: zs.
-  Proof.
+  Proof using.
     induction l; intros; simpl in *; intuition; subst; try congruence.
     - exists nil. simpl. find_apply_lem_hyp in_split. break_exists. subst. eauto.
     - exists nil. simpl. find_apply_lem_hyp in_split. break_exists. subst. eauto.
@@ -53,14 +53,14 @@ Section before.
       In(A:=A) x xs ->
       (~ In y xs) ->
       before x y (xs ++ y :: ys).
-  Proof.
+  Proof using.
     induction xs; intros; simpl in *; intuition.
   Qed.
 
   Definition before_func_dec :
     forall f g (l : list A),
       {before_func f g l} + {~ before_func f g l}.
-  Proof.
+  Proof using.
     intros. induction l; simpl in *.
     - intuition.
     - destruct (f a); destruct (g a); intuition.
@@ -70,7 +70,7 @@ Section before.
     forall f g l x,
       before_func (A := A) f g l ->
       before_func f g (l ++ x).
-  Proof.
+  Proof using.
     intros. induction l; simpl in *; intuition.
   Qed.
 
@@ -80,7 +80,7 @@ Section before.
       b <> x ->
       b <> y ->
       before a b (xs ++ x :: ys ++ y :: zs).
-  Proof.
+  Proof using.
     induction xs; intros; simpl in *; intuition.
     induction ys; intros; simpl in *; intuition.
   Qed.
@@ -90,7 +90,7 @@ Section before.
       before(A:=A) a b (xs ++ zs) ->
       b <> y ->
       before a b (xs ++ y :: zs).
-  Proof.
+  Proof using.
     intros.
     induction xs; intros; simpl in *; intuition.
   Qed.
@@ -101,7 +101,7 @@ Section before.
       a <> x ->
       a <> y ->
       before a b (xs ++ ys ++ zs).
-  Proof.
+  Proof using.
     induction xs; intros; simpl in *; intuition; try congruence; eauto.
     induction ys; intros; simpl in *; intuition; try congruence.
   Qed.
@@ -111,7 +111,7 @@ Section before.
       before(A:=A) a b (xs ++ y :: zs) ->
       a <> y ->
       before a b (xs ++ zs).
-  Proof.
+  Proof using.
     induction xs; intros; simpl in *; intuition; try congruence; eauto.
   Qed.
 
@@ -120,7 +120,7 @@ Section before.
       before (A := A) x y (remove dec y' l) ->
       y <> y' ->
       before x y l.
-  Proof.
+  Proof using.
     induction l; intros; simpl in *; intuition.
     break_if; subst; simpl in *; intuition eauto.
   Qed.
@@ -130,7 +130,7 @@ Section before.
       before x y l ->
       x <> x' ->
       before x y (remove dec x' l).
-  Proof.
+  Proof using.
     induction l; intros; simpl in *; intuition;
       break_if; subst; simpl in *; intuition eauto.
   Qed.
@@ -140,7 +140,7 @@ Section before.
       before (A := A) x y (l' ++ l) ->
       ~ In x l' ->
       before (A := A) x y l.
-  Proof.
+  Proof using.
     induction l'; intros; simpl in *; intuition.
   Qed.
 
@@ -149,7 +149,7 @@ Section before.
       before (A := A) x y l ->
       ~ In y l' ->
       before (A := A) x y (l' ++ l).
-  Proof.
+  Proof using.
     induction l'; intros; simpl in *; intuition.
   Qed.
 
@@ -158,7 +158,7 @@ Section before.
       before (A := A) x y l ->
       before y x l ->
       x = y.
-  Proof.
+  Proof using.
     intros.
     induction l; simpl in *; intuition; congruence.
   Qed.

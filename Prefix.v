@@ -18,7 +18,7 @@ Section prefix.
     forall (l : list A),
       Prefix l [] ->
       l = [].
-  Proof.
+  Proof using.
     intros. destruct l.
     - reflexivity.
     - contradiction.
@@ -28,7 +28,7 @@ Section prefix.
     forall (l l' : list A) a,
       Prefix l' l ->
       Prefix (a :: l') (a :: l).
-  Proof.
+  Proof using.
     simpl. intuition.
   Qed.
 
@@ -36,7 +36,7 @@ Section prefix.
     forall (l l' : list A),
       Prefix l' l ->
       (forall x, In x l' -> In x l).
-  Proof.
+  Proof using.
     induction l; intros l' H.
     - find_apply_lem_hyp Prefix_nil. subst. contradiction.
     - destruct l'.
@@ -49,7 +49,7 @@ Section prefix.
     forall (xs ys zs : list A),
       xs ++ ys = zs ->
       Prefix xs zs.
-  Proof.
+  Proof using.
     induction xs; intros; simpl in *.
     - auto.
     - break_match.
@@ -62,7 +62,7 @@ Section prefix.
       Prefix l l' ->
       In x l ->
       In x l'.
-  Proof.
+  Proof using.
     induction l; intros; simpl in *; intuition;
       subst; break_match; intuition; subst; intuition.
   Qed.

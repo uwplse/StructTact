@@ -20,7 +20,7 @@ Section remove_all.
     forall ds l x,
       In x (remove_all ds l) ->
       In x l.
-  Proof.
+  Proof using.
     induction ds; intros; simpl in *; intuition.
     eauto using in_remove.
   Qed.
@@ -30,7 +30,7 @@ Section remove_all.
       ~ In x ds ->
       In x l ->
       In x (remove_all ds l).
-  Proof.
+  Proof using.
     induction ds; intros; simpl in *; intuition auto using remove_preserve.
   Qed.
 
@@ -39,7 +39,7 @@ Section remove_all.
       In x (remove_all ds l) ->
       In x ds ->
       False.
-  Proof.
+  Proof using.
     induction ds; intros; simpl in *; intuition.
     - subst. find_apply_lem_hyp in_remove_all_was_in.
       eapply remove_In; eauto.
@@ -49,7 +49,7 @@ Section remove_all.
   Lemma remove_all_nil :
     forall ys,
       remove_all ys [] = [].
-  Proof.
+  Proof using.
     intros. induction ys; simpl in *; intuition.
   Qed.
 
@@ -59,7 +59,7 @@ Section remove_all.
        In a ys) \/
       (remove_all ys (a :: l) = a :: (remove_all ys l) /\
        ~In a ys).
-  Proof.
+  Proof using.
     induction ys; intros; simpl in *; intuition.
     break_if; subst; simpl in *; intuition.
     specialize (IHys a0 (remove A_eq_dec a l)). intuition.
@@ -70,7 +70,7 @@ Section remove_all.
       before x y (remove_all ys l) ->
       ~ In y ys ->
       before x y l.
-  Proof.
+  Proof using.
     induction l; intros; simpl in *; intuition.
     - rewrite remove_all_nil in *. simpl in *. intuition.
     - pose proof remove_all_cons ys a l. intuition.
@@ -84,7 +84,7 @@ Section remove_all.
       before x y l ->
       ~ In x xs ->
       before x y (remove_all xs l).
-  Proof.
+  Proof using.
     induction l; intros; simpl in *; intuition;
       pose proof remove_all_cons xs a l; subst; intuition;
         repeat find_rewrite; simpl in *; intuition.

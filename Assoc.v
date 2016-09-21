@@ -47,7 +47,7 @@ Section assoc.
   Lemma get_set_same :
     forall k v l,
       assoc (assoc_set l k v) k = Some v.
-  Proof.
+  Proof using.
     induction l; intros; simpl; repeat (break_match; simpl); subst; congruence.
   Qed.
 
@@ -55,7 +55,7 @@ Section assoc.
     forall k k' v l,
       k = k' ->
       assoc (assoc_set l k v) k' = Some v.
-  Proof.
+  Proof using.
     intros. subst. auto using get_set_same.
   Qed.
 
@@ -63,7 +63,7 @@ Section assoc.
     forall k k' v l,
       k <> k' ->
       assoc (assoc_set l k v) k' = assoc l k'.
-  Proof.
+  Proof using.
     induction l; intros; simpl; repeat (break_match; simpl); subst; try congruence; auto.
   Qed.
 
@@ -71,7 +71,7 @@ Section assoc.
     forall k l,
       ~ In k (map (@fst _ _) l) ->
       assoc l k = None.
-  Proof.
+  Proof using.
     intros.
     induction l.
     - auto.
@@ -82,7 +82,7 @@ Section assoc.
   Lemma get_del_same :
     forall k l,
       assoc (assoc_del l k) k = None.
-  Proof.
+  Proof using.
     induction l; intros; simpl in *.
     - auto.
     - repeat break_match; subst; simpl in *; auto.
@@ -93,7 +93,7 @@ Section assoc.
     forall k k' l,
       k <> k' ->
       assoc (assoc_del l k') k = assoc l k.
-  Proof.
+  Proof using.
     induction l; intros; simpl in *.
     - auto.
     - repeat (break_match; simpl); subst; try congruence; auto.
@@ -103,7 +103,7 @@ Section assoc.
     forall (k k' : K) (v : V) l d,
       k <> k' ->
       assoc_default (assoc_set l k v) k' d = assoc_default l k' d.
-  Proof.
+  Proof using.
     unfold assoc_default.
     intros.
     repeat break_match; auto;
@@ -113,7 +113,7 @@ Section assoc.
   Lemma get_set_same_default :
     forall (k : K) (v : V) l d,
       assoc_default (assoc_set l k v) k d = v.
-  Proof.
+  Proof using.
     unfold assoc_default.
     intros.
     repeat break_match; auto;
@@ -124,7 +124,7 @@ Section assoc.
     forall l k (v : V) d,
       assoc l k = Some v ->
       assoc_default l k d = v.
-  Proof.
+  Proof using.
     intros. unfold assoc_default.
     break_match; congruence.
   Qed.
@@ -133,7 +133,7 @@ Section assoc.
     forall (l : list (K * V)) k d,
       assoc l k = None ->
       assoc_default l k d = d.
-  Proof.
+  Proof using.
     intros. unfold assoc_default.
     break_match; congruence.
   Qed.
@@ -142,7 +142,7 @@ Section assoc.
     forall (l : list (K * V)) k v,
       assoc l k = Some v ->
       assoc_set l k v = l.
-  Proof.
+  Proof using.
     intros. induction l; simpl in *; auto; try congruence.
     repeat break_match; simpl in *; intuition.
     - subst. find_inversion. auto.
@@ -152,7 +152,7 @@ Section assoc.
   Lemma assoc_default_assoc_set :
     forall l (k : K) (v : V) d,
       assoc_default (assoc_set l k v) k d = v.
-  Proof.
+  Proof using.
     intros. unfold assoc_default.
     rewrite get_set_same. auto.
   Qed.
@@ -160,7 +160,7 @@ Section assoc.
   Lemma assoc_set_assoc_set_same :
     forall l (k : K) (v : V) v',
       assoc_set (assoc_set l k v) k v' = assoc_set l k v'.
-  Proof.
+  Proof using.
     induction l; intros; simpl in *; repeat break_match; simpl in *; subst; try congruence; eauto;
 break_if; congruence.
   Qed.
@@ -172,7 +172,7 @@ break_if; congruence.
   Lemma a_equiv_refl :
     forall l,
       a_equiv l l.
-  Proof.
+  Proof using.
     intros. unfold a_equiv. auto.
   Qed.
 
@@ -180,7 +180,7 @@ break_if; congruence.
     forall l l',
       a_equiv l l' ->
       a_equiv l' l.
-  Proof.
+  Proof using.
     unfold a_equiv. intros. auto.
   Qed.
 
@@ -189,7 +189,7 @@ break_if; congruence.
       a_equiv l l' ->
       a_equiv l' l'' ->
       a_equiv l l''.
-  Proof.
+  Proof using.
     unfold a_equiv in *.
     intros. repeat find_higher_order_rewrite.
     auto.
@@ -214,7 +214,7 @@ break_if; congruence.
       k <> k' ->
       a_equiv (assoc_set (assoc_set l k v) k' v')
               (assoc_set (assoc_set l k' v') k v).
-  Proof.
+  Proof using.
     unfold a_equiv.
     intros.
     assoc_destruct.
@@ -228,7 +228,7 @@ break_if; congruence.
     forall l,
       a_equiv l [] ->
       l = [].
-  Proof.
+  Proof using.
     intros.
     destruct l; auto.
     unfold a_equiv in *. simpl in *.
@@ -241,7 +241,7 @@ break_if; congruence.
     forall l l' (k : K) (v : V),
       a_equiv l l' ->
       a_equiv (assoc_set l k v) (assoc_set l' k v).
-  Proof.
+  Proof using.
     unfold a_equiv.
     intros.
     assoc_destruct; assoc_rewrite; auto.
@@ -251,7 +251,7 @@ break_if; congruence.
     forall l l' (k : K) (v : V),
       a_equiv l l' ->
       assoc_default l k v = assoc_default l' k v.
-  Proof.
+  Proof using.
     intros. unfold a_equiv, assoc_default in *.
     find_higher_order_rewrite.
     auto.
@@ -261,7 +261,7 @@ break_if; congruence.
     forall l l' (k : K),
       a_equiv l l' ->
       assoc l k = assoc l' k.
-  Proof.
+  Proof using.
     unfold a_equiv.
     auto.
   Qed.
@@ -271,7 +271,7 @@ break_if; congruence.
       k <> k' ->
       assoc_default (assoc_set l k' v) k d =
       assoc_default l k d.
-  Proof.
+  Proof using.
     intros. unfold assoc_default. rewrite get_set_diff; auto.
   Qed.
 End assoc.
