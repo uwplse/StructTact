@@ -8,15 +8,19 @@ popd
 
 ./build.sh
 
-pushd ..
-  git clone 'http://github.com/uwplse/verdi'
-  pushd verdi
-    ./build.sh
-  popd
+case $DOWNSTREAM in
+verdi)
+  pushd ..
+    git clone 'http://github.com/uwplse/verdi'
+    pushd verdi
+      ./build.sh
+    popd
 
-  git clone 'http://github.com/uwplse/verdi-raft'
-  pushd verdi-raft
-    ./build.sh
+    git clone 'http://github.com/uwplse/verdi-raft'
+    pushd verdi-raft
+      ./build.sh
+    popd
   popd
-popd
+  ;;
+esac
 
