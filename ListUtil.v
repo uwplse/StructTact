@@ -336,7 +336,7 @@ Section list_util.
       NoDup xs ->
       (forall x : A, In x xs -> In x ys) ->
       length ys >= length xs.
-  Proof using Type*.
+  Proof using A_eq_dec.
     induction xs; intros.
     - simpl. omega.
     - specialize (IHxs (remove A_eq_dec a ys)).
@@ -574,7 +574,7 @@ Section list_util.
       NoDup sub2 ->
       length sub1 + length sub2 > length l ->
       exists a, In a sub1 /\ In a sub2.
-  Proof using Type*.
+  Proof using A_eq_dec.
     induction l.
     intros.
     + simpl in *. find_apply_lem_hyp plus_gt_0. intuition.
