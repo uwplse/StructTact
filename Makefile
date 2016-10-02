@@ -7,6 +7,9 @@ endif
 default: Makefile.coq
 	$(MAKE) -f Makefile.coq
 
+quick: Makefile.coq
+	$(MAKE) -f Makefile.coq quick
+
 Makefile.coq: _CoqProject
 	coq_makefile -f _CoqProject -o Makefile.coq
 
