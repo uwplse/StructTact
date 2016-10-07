@@ -1,6 +1,7 @@
 Require Import List.
 Import ListNotations.
 Require Import StructTact.StructTactics.
+Require Import StructTact.ListTactics.
 Require Import StructTact.ListUtil.
 Require Import StructTact.RemoveAll.
 Require Import FunctionalExtensionality.
@@ -33,3 +34,881 @@ Fixpoint filter_rel {A : Type} {rel : relation A} (A_rel_dec : forall x y : A, {
 Definition map2fst {A B : Type} (a : A) := map (fun (b : B) => (a, b)).
 
 Definition map2snd {A B : Type} (b : B) := map (fun (a : A) => (a, b)).
+
+Section update2.
+
+Variables A B : Type.
+Variable R : relation A.
+
+Hypothesis A_eq_dec : forall x y : A, {x = y} + {x <> y}.
+Hypothesis R_dec : forall x y : A, {R x y} + {~ R x y}.
+
+Lemma filter_rel_related :
+  forall n n' ns,
+  In n' (filter_rel R_dec n ns) ->
+  In n' ns /\ R n n'.
+Proof.
+intros.
+induction ns; simpl in *; [ intuition | idtac ].
+break_if; simpl in *.
+- break_or_hyp; auto.
+  concludes.
+  break_and.
+  auto.
+- concludes.
+  break_and.
+  auto.
+Qed.
+
+Lemma related_filter_rel : 
+  forall n n' ns,
+    In n' ns -> 
+    R n n' ->
+    In n' (filter_rel R_dec n ns).
+Proof.
+intros.
+induction ns; simpl in *; [ intuition | idtac ].
+break_if.
+- break_or_hyp.
+  * left; auto.
+  * concludes.
+    right; auto.
+- break_or_hyp.
+  * intuition.
+  * concludes.
+    assumption.
+Qed.
+
+Lemma not_in_not_in_filter_rel :
+  forall ns n h,
+    ~ In n ns ->
+    ~ In n (filter_rel R_dec h ns).
+Proof.
+induction ns; intros; auto.
+assert (H_neq: a <> n).
+  intro.
+  subst.
+  auto with datatypes.
+assert (H_not_in: ~ In n ns).
+  intro.
+  intuition.
+simpl.
+break_if; auto.
+simpl.
+intro.
+break_or_hyp; auto.
+intuition eauto.
+Qed.
+
+Lemma NoDup_filter_rel:
+  forall h ns,
+    NoDup ns ->
+    NoDup (filter_rel R_dec h ns).
+Proof.
+intros.
+induction ns; auto.
+invc_NoDup.
+concludes.
+simpl in *.
+break_if; auto.
+apply NoDup_cons; auto.
+apply not_in_not_in_filter_rel.
+assumption.
+Qed.
+
+Lemma filter_rel_self_eq {irreflexive_R : Irreflexive R} :
+  forall ns0 ns1 h,
+  filter_rel R_dec h (ns0 ++ h :: ns1) = filter_rel R_dec h (ns0 ++ ns1).
+Proof.
+induction ns0; intros; simpl in *.
+- break_if; auto.
+  find_apply_lem_hyp irreflexive_R.
+  intuition.
+- break_if; auto.
+  find_higher_order_rewrite.
+  trivial.
+Qed.
+
+Lemma collate_f_eq :
+  forall (f : A -> A -> list B) g h n n' l,
+  f n n' = g n n' ->
+  collate A_eq_dec h f l n n' = collate A_eq_dec h g l n n'.
+Proof.
+intros f g h n n' l.
+generalize f g; clear f g.
+induction l; auto.
+intros.
+simpl in *.
+break_let.
+destruct a.
+find_injection.
+set (f' := update2 _ _ _ _ _).
+set (g' := update2 _ _ _ _ _).
+rewrite (IHl f' g'); auto.
+unfold f', g', update2.
+break_if; auto.
+break_and.
+subst.
+find_rewrite.
+trivial.
+Qed.
+
+Lemma collate_in_in :
+  forall l h n n' (f : A -> A -> list B) a,
+    In a (f n' n) ->
+    In a ((collate A_eq_dec h f l) n' n).
+Proof.
+induction l; intros; auto.
+destruct a.
+apply IHl.
+unfold update2.
+break_if; auto.
+break_and.
+subst.
+apply in_or_app.
+left.
+assumption.
+Qed.
+
+Lemma collate_neq :
+  forall h n n' ns (f : A -> A -> list B),
+    h <> n ->
+    collate A_eq_dec h f ns n n' = f n n'.
+Proof.
+intros.
+revert f.
+induction ns; intros; auto.
+destruct a.
+simpl in *.
+rewrite IHns.
+unfold update2.
+break_if; auto.
+break_and; subst.
+intuition.
+Qed.
+
+Lemma collate_not_in_eq :
+  forall h' h (f : A -> A -> list B) l,
+ ~ In h (map fst l) ->
+  collate A_eq_dec h' f l h' h = f h' h.
+Proof.
+intros.
+revert f.
+induction l; intros; auto.
+simpl in *.
+break_let.
+destruct a.
+find_injection.
+rewrite IHl; unfold update2.
+- break_if.
+  * break_and; subst.
+    simpl in *.
+    contradict H.
+    left.
+    trivial.
+  * intros.
+    trivial.
+- intro.
+  contradict H.
+  right.
+  assumption.
+Qed.
+
+Lemma collate_app :
+  forall h' l1 l2 (f : A -> A -> list B),
+  collate A_eq_dec h' f (l1 ++ l2) = collate A_eq_dec h' (collate A_eq_dec h' f l1) l2.
+Proof.
+induction l1; intros; auto.
+simpl.
+break_let.
+destruct a.
+find_injection.
+rewrite IHl1.
+trivial.
+Qed.
+
+Lemma collate_neq_update2 :
+  forall h h' n (f : A -> A -> list B) l ms,
+  n <> h' ->
+  collate A_eq_dec h (update2 A_eq_dec f h n ms) l h h' = collate A_eq_dec h f l h h'.
+Proof.
+intros.
+assert (H_eq: update2 A_eq_dec f h n ms h h' =  f h h').
+  unfold update2.
+  break_if; auto.
+  break_and; subst.
+  intuition.
+rewrite (collate_f_eq _ _ _ _ _ _ H_eq).
+trivial.
+Qed.
+
+Lemma collate_not_in :
+  forall h h' l1 l2 (f : A -> A -> list B),
+  ~ In h' (map fst l1) ->
+  collate A_eq_dec h f (l1 ++ l2) h h' = collate A_eq_dec h f l2 h h'.
+Proof.
+intros.
+rewrite collate_app.
+revert f.
+induction l1; intros; simpl in *; auto.
+break_let.
+rewrite IHl1.
+- destruct a.
+  find_injection.
+  simpl in *.
+  assert (H_neq: a0 <> h').
+    intro.
+    contradict H.
+    left.
+    trivial.
+  rewrite collate_neq_update2; trivial.
+- intro.
+  contradict H.
+  right.
+  trivial.
+Qed.
+
+Lemma collate_not_in_mid :
+ forall h h' l1 l2 (f : A -> A -> list B) m,
+   ~ In h (map fst (l1 ++ l2)) ->
+   collate A_eq_dec h' (update2 A_eq_dec f h' h (f h' h ++ [m])) (l1 ++ l2) = collate A_eq_dec h' f (l1 ++ (h, m) :: l2).
+Proof.
+intros h h' l1 l2 f m H_in.
+apply functional_extensionality; intro from.
+apply functional_extensionality; intro to.
+case (A_eq_dec h' from); intro H_dec.
+- rewrite <- H_dec.
+  case (A_eq_dec h to); intro H_dec'.
+  * rewrite <- H_dec'.
+    rewrite collate_not_in.
+    + subst.
+      rewrite collate_not_in; auto.
+      intro.
+      contradict H_in.
+      rewrite map_app.
+      apply in_or_app.
+      left.
+      assumption.
+    + intro.
+      contradict H_in.
+      rewrite map_app.
+      apply in_or_app.
+      left.
+      assumption.
+  * rewrite collate_neq_update2; auto.
+    rewrite collate_app.
+    rewrite collate_app.
+    simpl.
+    rewrite collate_neq_update2; auto.
+- rewrite collate_neq; auto.
+  rewrite collate_neq; auto.
+  unfold update2.
+  break_if; auto.
+  break_and; subst.
+  intuition.
+Qed.
+
+Lemma NoDup_Permutation_collate_eq :
+  forall h (f : A -> A -> list B) l l',
+    NoDup (map fst l) ->
+    Permutation l l' ->
+    collate A_eq_dec h f l = collate A_eq_dec h f l'.
+Proof.
+intros h f l.
+revert h f.
+induction l.
+- intros.
+  find_apply_lem_hyp Permutation_nil.
+  subst.
+  trivial.
+- intros.
+  destruct a.
+  simpl in *.
+  invc_NoDup.  
+  assert (H_in': In (a, b) ((a, b) :: l)). 
+    left.
+    trivial.
+  pose proof (Permutation_in _ H0 H_in') as H_pm'.
+  apply in_split in H_pm'.
+  break_exists; subst.
+  find_apply_lem_hyp Permutation_cons_app_inv.
+  pose proof (IHl h (update2 A_eq_dec f h a (f h a ++ [b])) _ H4 H0) as IHl'.
+  rewrite IHl'.
+  rewrite collate_not_in_mid; auto.
+  intro.
+  assert (H_pm': Permutation (map (fun nm : A * B => fst nm) l) (map (fun nm : A * B => fst nm) (x ++ x0))).
+    apply Permutation_map_fst.
+    trivial.
+  contradict H3.
+  revert H.
+  apply Permutation_in.
+  apply Permutation_sym.
+  trivial.
+Qed.
+
+Lemma collate_map2snd_not_related :
+  forall m n h ns (f : A -> A -> list B),
+    ~ R h n ->
+    collate A_eq_dec h f (map2snd m (filter_rel R_dec h ns)) h n = f h n.
+Proof.
+intros m n h ns f H_adj.
+revert f.
+induction ns; intros; auto.
+simpl.
+break_if; simpl; auto.
+rewrite IHns.
+unfold update2.
+break_if; auto.
+break_and; subst.
+intuition.
+Qed.
+
+Lemma collate_map2snd_not_in :
+  forall m n h ns (f : A -> A -> list B),
+    ~ In n ns ->
+    collate A_eq_dec h f (map2snd m (filter_rel R_dec h ns)) h n = f h n.
+Proof.
+intros m n h ns f.
+revert f.
+induction ns; intros; auto.
+simpl in *.
+break_if; simpl.
+- rewrite IHns.
+  * unfold update2.
+    break_if; auto.
+    break_and; subst.
+    contradict H.
+    left.
+    trivial.
+  * intro.
+    contradict H.
+    right.
+    assumption.
+- rewrite IHns; auto.
+Qed.
+
+Lemma collate_map2snd_not_in_remove_all :
+  forall m n h ns (f : A -> A -> list B) ns',
+    ~ In n ns ->
+    collate A_eq_dec h f (map2snd m (filter_rel R_dec h (remove_all A_eq_dec ns' ns))) h n = f h n.
+Proof.
+intros m n h ns f ns' H_in.
+apply collate_map2snd_not_in.
+intro.
+find_apply_lem_hyp in_remove_all_was_in.
+intuition.
+Qed.
+
+Lemma collate_map2snd_not_in_related :
+  forall m n h ns (f : A -> A -> list B) ns',
+    ~ In n ns' ->
+    R h n ->
+    In n ns ->
+    NoDup ns ->
+    collate A_eq_dec h f (map2snd m (filter_rel R_dec h (remove_all A_eq_dec ns' ns))) h n = f h n ++ [m].
+Proof.
+intros m n h ns f ns' H_in H_adj.
+revert f.
+induction ns; intros; [ contradict H | idtac ].
+invc_NoDup.
+simpl in *.
+break_or_hyp.
+- pose proof (remove_all_cons A_eq_dec ns' n ns) as H_ra.
+  break_or_hyp; break_and; intuition.
+  find_rewrite.
+  simpl.
+  break_if; intuition.
+  simpl.
+  rewrite collate_map2snd_not_in_remove_all; auto.
+  unfold update2.
+  break_if; auto.
+  intuition.
+- assert (H_neq: a <> n).
+    intro.
+    subst.
+    intuition.  
+  pose proof (remove_all_cons A_eq_dec ns' a ns) as H_ra.
+  break_or_hyp; break_and. 
+  * find_rewrite.
+    rewrite IHns; auto.
+  * find_rewrite.
+    simpl.
+    break_if; auto.
+    simpl.
+    rewrite IHns; auto.
+    unfold update2.
+    break_if; auto.
+    break_and.
+    subst.
+    intuition.
+Qed.
+
+Lemma collate_map2snd_in :
+  forall m n h ns (f : A -> A -> list B) ns',
+    In n ns' ->
+    collate A_eq_dec h f (map2snd m (filter_rel R_dec h (remove_all A_eq_dec ns' ns))) h n = f h n.
+Proof.
+intros m n h ns f ns'.
+revert f.
+induction ns; intros.
+- rewrite remove_all_nil.
+  trivial.
+- pose proof (remove_all_cons A_eq_dec ns' a ns) as H_ra.
+  break_or_hyp; break_and; find_rewrite.
+  * rewrite IHns; trivial.
+  * simpl.
+    break_if.
+    + simpl.
+      rewrite IHns; simpl; auto.
+      unfold update2.
+      break_if; auto.
+      break_and; subst.
+      intuition.
+    + rewrite IHns; trivial.
+Qed.
+
+Lemma collate_map2snd_related_not_in :
+  forall a n h ns (f : A -> A -> list B),
+    R h n ->
+    ~ In n ns ->
+    collate A_eq_dec h f (map2snd a (filter_rel R_dec h (n :: ns))) h n = f h n ++ [a].
+Proof.
+intros a n h ns f H_adj H_in.
+simpl.
+break_if; intuition.
+clear r.
+revert f n h H_in H_adj.
+induction ns; intros; simpl.
+- unfold update2.
+  break_if; auto.
+  intuition.
+- assert (H_in': ~ In n ns).
+    intro.
+    contradict H_in.
+    right.
+    trivial.
+  assert (H_neq: n <> a0). 
+    intro.
+    subst.
+    contradict H_in.
+    left.
+    trivial.
+  simpl in *.
+  break_if.
+  * simpl.
+    unfold update2 at 3.
+    break_if; intuition eauto.
+    pose proof (IHns f) as IH'.
+    rewrite collate_map2snd_not_in; auto.
+    unfold update2.
+    break_if; intuition eauto.
+    break_if; auto.
+    intuition.
+  * rewrite IHns; auto.
+Qed.
+
+Lemma in_collate_in :
+  forall ns n h (f : A -> A -> list B) a,
+  ~ In n ns ->
+  In a (collate A_eq_dec h f (map2snd a (filter_rel R_dec h ns)) h n) ->
+  In a (f h n).
+Proof.
+induction ns; intros; auto.
+assert (H_in': ~ In n ns).
+  intro.
+  contradict H.
+  right.
+  trivial.
+assert (H_neq: n <> a). 
+  intro.
+  subst.
+  contradict H.
+  left.
+  trivial.
+simpl in *.
+break_if; auto.
+simpl in *.
+assert (H_eq_f: update2 A_eq_dec f h a (f h a ++ [a0]) h n = f h n).
+  unfold update2.
+  break_if; auto.
+  break_and; subst.
+  intuition.
+rewrite (collate_f_eq _ _ _ _ _ _ H_eq_f) in H0.
+apply IHns; auto.
+Qed.
+
+Lemma not_in_map2snd :
+  forall n h (m : B) ns,
+    ~ In n ns ->
+    ~ In (n, m) (map2snd m (filter_rel R_dec h ns)).
+Proof.
+intros.
+induction ns; intros; auto.
+simpl in *.
+break_if.
+- simpl.
+  intro.
+  break_or_hyp.
+  * find_injection.
+    contradict H.
+    left.
+    trivial.
+  * contradict H1.
+    apply IHns.
+    intro.
+    contradict H.
+    right.
+    assumption.
+- apply IHns.
+  intro.
+  contradict H.
+  right.
+  assumption.
+Qed.
+
+Lemma NoDup_map2snd :
+  forall h (m : B) ns,
+    NoDup ns ->
+    NoDup (map2snd m (filter_rel R_dec h ns)).
+Proof.
+intros.
+induction ns.
+- apply NoDup_nil.
+- invc_NoDup.
+  concludes.
+  simpl.
+  break_if; auto.
+  simpl.
+  apply NoDup_cons; auto.
+  apply not_in_map2snd.
+  assumption.
+Qed.
+
+Lemma in_map2snd_snd :
+  forall h (m : B) ns nm,
+  In nm (map2snd m (filter_rel R_dec h ns)) ->
+  snd nm = m.
+Proof.
+intros.
+induction ns; intros; simpl in *; intuition.
+break_if.
+- simpl in *.
+  break_or_hyp; intuition eauto.
+- apply IHns.
+  assumption.
+Qed.
+
+Lemma in_map2snd_related_in :
+  forall (m : B) ns n h,
+  In (n, m) (map2snd m (filter_rel R_dec h ns)) ->
+  R h n /\ In n ns.
+Proof.
+intros m.
+induction ns; intros; simpl in *; [ intuition | idtac ].
+break_if; simpl in *.
+- break_or_hyp.
+  * find_injection; auto.
+  * find_apply_hyp_hyp.
+    break_and.
+    auto.
+- find_apply_hyp_hyp.
+  break_and.
+  auto.
+Qed.
+
+Lemma collate_ls_not_in :
+  forall ns (f : A -> A -> list B) h mg from to,
+    ~ In from ns ->
+    collate_ls A_eq_dec ns f h mg from to = f from to.
+Proof.
+induction ns; intros; auto.
+assert (H_neq: a <> from).
+  intro.
+  subst.
+  contradict H.
+  left.
+  trivial.
+assert (H_in': ~ In from ns).
+  intro.
+  contradict H.
+  right.
+  assumption.
+simpl.
+rewrite IHns; auto.
+unfold update2.
+break_if; auto.
+break_and; subst.
+intuition. 
+Qed.
+
+Lemma collate_ls_neq_to : 
+  forall ns (f : A -> A -> list B) h mg from to,
+    h <> to ->
+    collate_ls A_eq_dec ns f h mg from to = f from to.
+Proof.
+induction ns; intros; auto.
+simpl in *.
+rewrite IHns; auto.
+unfold update2.
+break_if; auto.
+break_and; subst.
+intuition.
+Qed.
+
+Lemma collate_ls_NoDup_in :
+  forall ns (f : A -> A -> list B) h mg from,
+  NoDup ns ->
+  In from ns ->
+  collate_ls A_eq_dec ns f h mg from h = f from h ++ [mg].
+Proof.
+induction ns; intros; simpl in *; [ intuition | idtac ].
+invc_NoDup.
+break_or_hyp.
+- rewrite collate_ls_not_in; auto.
+  unfold update2.
+  break_if; auto.
+  break_or_hyp; intuition.
+- assert (H_neq: a <> from).
+    intro.
+    find_rewrite.
+    auto.
+  rewrite IHns; auto.
+  unfold update2.
+  break_if; auto.
+  break_and; subst.
+  intuition.
+Qed.
+
+Lemma collate_ls_live_related : 
+  forall ns (f : A -> A -> list B) ns' h mg from,
+  ~ In from ns' ->
+  R h from ->
+  In from ns ->
+  NoDup ns ->     
+  collate_ls A_eq_dec (filter_rel R_dec h (remove_all A_eq_dec ns' ns)) f h mg from h = f from h ++ [mg].
+Proof.
+intros.
+rewrite collate_ls_NoDup_in; auto.
+- apply NoDup_filter_rel.
+  apply NoDup_remove_all.
+  assumption.
+- apply related_filter_rel.
+  apply in_remove_all_preserve; auto.
+  assumption.
+Qed.
+
+Lemma collate_ls_f_eq :
+  forall ns (f : A -> A -> list B) g h mg n n',
+  f n n' = g n n' ->
+  collate_ls A_eq_dec ns f h mg n n' = collate_ls A_eq_dec ns g h mg n n'.
+Proof.
+induction ns; intros; simpl in *; auto.
+set (f' := update2 _ _ _ _ _).
+set (g' := update2 _ _ _ _ _).
+rewrite (IHns f' g'); auto.
+unfold f', g', update2.
+break_if; auto.
+break_and.
+subst.
+find_rewrite.
+trivial.
+Qed.
+
+Lemma collate_ls_neq_update2 : 
+  forall ns (f : A -> A -> list B) n h h' ms mg,
+  n <> h' ->
+  collate_ls A_eq_dec ns (update2 A_eq_dec f n h ms) h mg h' h = collate_ls A_eq_dec ns f h mg h' h.
+Proof.
+intros.
+assert (H_eq: update2 A_eq_dec f n h ms h' h = f h' h).
+  unfold update2.
+  break_if; auto.
+  break_and.
+  subst.
+  intuition.
+rewrite (collate_ls_f_eq _ _ _ _ _ _ _ H_eq).
+trivial.
+Qed.
+
+Lemma collate_ls_not_related :
+  forall ns (f : A -> A -> list B) n h mg,
+    ~ R h n ->
+    collate_ls A_eq_dec (filter_rel R_dec h ns) f h mg n h = f n h.
+Proof.
+induction ns; intros; simpl in *; auto.
+case (A_eq_dec n a); intro.
+- subst.
+  break_if; auto.
+  intuition.
+- break_if; auto.
+  simpl.
+  rewrite IHns; auto.
+  unfold update2.
+  break_if; auto.
+  break_and.
+  subst.
+  intuition.
+Qed.
+
+Lemma collate_ls_not_in_related :
+  forall ns (f : A -> A -> list B) n h mg,
+    ~ In n ns ->
+    collate_ls A_eq_dec (filter_rel R_dec h ns) f h mg n h = f n h.
+Proof.
+intros.
+rewrite collate_ls_not_in; auto.
+apply not_in_not_in_filter_rel.
+assumption.
+Qed.
+
+Lemma collate_ls_not_in_related_remove_all :
+  forall ns (f : A -> A -> list B) n h mg ns',
+    ~ In n ns ->
+    collate_ls A_eq_dec (filter_rel R_dec h (remove_all A_eq_dec ns' ns)) f h mg n h = f n h.
+Proof.
+intros.
+rewrite collate_ls_not_in; auto.
+apply not_in_not_in_filter_rel.
+intro.
+contradict H.
+eapply in_remove_all_was_in; eauto.
+Qed.
+
+Lemma collate_ls_in_remove_all :
+  forall mg n h ns (f : A -> A -> list B) ns',
+    In n ns' ->
+    collate_ls A_eq_dec (filter_rel R_dec h (remove_all A_eq_dec ns' ns)) f h mg n h = f n h.
+Proof.
+intros.
+revert f.
+induction ns; intros.
+- rewrite remove_all_nil.
+  trivial.
+- pose proof (remove_all_cons A_eq_dec ns' a ns) as H_cn.
+  break_or_hyp; break_and; find_rewrite.
+  * rewrite IHns.
+    trivial.
+  * simpl in *.
+    break_if; auto.
+    simpl.
+    assert (H_neq: a <> n).
+      intro.
+      subst.
+      intuition.
+    rewrite IHns.
+    unfold update2.
+    break_if; auto.
+    break_and; subst.
+    intuition.
+Qed.
+
+Lemma collate_ls_app :
+  forall l1 l2 (f : A -> A -> list B) h m,
+  collate_ls A_eq_dec (l1 ++ l2) f h m = collate_ls A_eq_dec l2 (collate_ls A_eq_dec l1 f h m) h m.
+Proof. 
+induction l1; simpl in *; intuition eauto.
+Qed.
+
+Lemma collate_ls_split_eq :
+  forall l1 l2 (f : A -> A -> list B) h m from to,
+  h <> from -> 
+  collate_ls A_eq_dec (l1 ++ h :: l2) f to m from to =
+  collate_ls A_eq_dec  (l1 ++ l2) f to m from to.
+Proof.
+induction l1; simpl in *; auto.
+intros.
+apply collate_ls_f_eq.
+unfold update2.
+break_if; auto.
+break_and.
+subst.
+intuition.
+Qed.
+
+Lemma collate_ls_not_in_mid :
+ forall h h' l1 l2 (f : A -> A -> list B) m,
+   ~ In h' (l1 ++ l2) ->
+   collate_ls A_eq_dec (l1 ++ l2) (update2 A_eq_dec f h' h (f h' h ++ [m])) h m = collate_ls A_eq_dec (l1 ++ h' :: l2) f h m.
+Proof.
+intros h h' l1 l2 f m H_in.
+apply functional_extensionality; intro from.
+apply functional_extensionality; intro to.
+case (A_eq_dec h' from); intro H_dec; case (A_eq_dec h to); intro H_dec'.
+- rewrite <- H_dec.
+  rewrite <- H_dec'.
+  rewrite collate_ls_not_in; auto.
+  rewrite collate_ls_app; simpl.
+  set (f' := collate_ls _ l1 _ _ _).
+  rewrite collate_ls_not_in.
+  * unfold update2 at 2.
+    break_if.
+    + unfold f'.
+      rewrite collate_ls_not_in.
+      -- unfold update2.
+         break_if; auto.
+         break_or_hyp; intuition.
+      -- intro.
+         contradict H_in.
+         apply in_or_app.
+         left.
+         assumption.
+    + break_or_hyp; intuition.
+  * intro.
+    contradict H_in.
+    apply in_or_app.
+    right.
+    assumption.
+- rewrite collate_ls_neq_to; auto.
+  rewrite collate_ls_neq_to; auto.
+  unfold update2.
+  break_if; auto.
+  break_and; subst.
+  intuition.
+- rewrite H_dec'. 
+  rewrite collate_ls_neq_update2; auto.
+  rewrite collate_ls_split_eq; auto.
+- rewrite collate_ls_neq_to; auto.
+  rewrite collate_ls_neq_to; auto.
+  unfold update2.
+  break_if; auto.
+  break_and; subst.
+  intuition.
+Qed.
+
+Lemma NoDup_Permutation_collate_ls_eq :
+  forall l (f : A -> A -> list B) h m l',
+    NoDup l ->
+    Permutation l l' ->
+    collate_ls A_eq_dec l f h m = collate_ls A_eq_dec l' f h m.
+Proof.
+intros l f h m l'.
+revert f l'.
+induction l.
+- intros.
+  find_apply_lem_hyp Permutation_nil.
+  subst.
+  trivial.
+- intros.
+  invc_NoDup.
+  simpl in *.
+  assert (H_in: In a (a :: l)).
+    left.
+    trivial.
+  pose proof (Permutation_in _ H0 H_in) as H_pm'.
+  find_apply_lem_hyp in_split.
+  break_exists.
+  subst_max.
+  find_apply_lem_hyp Permutation_cons_app_inv.
+  set (f' := update2 _ _ _ _ _).
+  rewrite (IHl f' _ H4 H0); auto.
+  unfold f'.
+  rewrite collate_ls_not_in_mid; auto.
+  intro.
+  contradict H3.
+  revert H.
+  apply Permutation_in.
+  apply Permutation_sym.
+  assumption.
+Qed.
+
+End update2.
