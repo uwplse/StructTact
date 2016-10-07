@@ -2,6 +2,7 @@ Require Import List.
 Import ListNotations.
 Require Import StructTact.StructTactics.
 Require Import StructTact.ListUtil.
+Require Import StructTact.ListTactics.
 Require Import StructTact.Before.
 
 Set Implicit Arguments.
@@ -88,6 +89,59 @@ Section remove_all.
     induction l; intros; simpl in *; intuition;
       pose proof remove_all_cons xs a l; subst; intuition;
         repeat find_rewrite; simpl in *; intuition.
+  Qed.
+
+  Lemma NoDup_remove_all :
+    forall l l',
+    NoDup l' ->
+    NoDup (remove_all l l').
+  Proof.
+    intros.
+    induction l'.
+    - rewrite remove_all_nil; auto.
+    - invc_NoDup.
+      concludes.
+      pose proof remove_all_cons l a l'.
+      break_or_hyp; break_and; find_rewrite; auto.
+      constructor; auto.
+      intro.
+      find_apply_lem_hyp in_remove_all_was_in; auto.
+  Qed.
+
+  Lemma remove_all_NoDup_split :
+    forall l l' l0 l1 a,
+     NoDup l' ->
+     remove_all l l' = l0 ++ a :: l1 ->
+     remove_all l (remove A_eq_dec a l') = l0 ++ l1.
+  Proof.
+    induction l'; intros; simpl in *.
+    - find_rewrite_lem remove_all_nil.
+      destruct l0; simpl in *; match goal with H: [] = _ |- _ => contradict H end; auto using nil_cons.
+    - invc_NoDup.
+      break_if; subst.
+      * rewrite remove_not_in; auto.
+        pose proof remove_all_cons l a l'.
+        break_or_hyp; break_and.
+        + find_rewrite.          
+          match goal with H0: NoDup _, H1: _ = remove_all _ _ |- _ => specialize (IHl' _ _ _ H0 (eq_sym H1)) end.
+          rewrite remove_not_in in IHl'; auto.
+        + destruct l0; simpl in *; find_rewrite; find_injection; auto.
+          assert (In a (remove_all l l')).
+            match goal with H: _ = remove_all _ _ |- _ => rewrite <- H end.
+            apply in_or_app.
+            right; left; auto.
+          find_apply_lem_hyp in_remove_all_was_in.
+          intuition.
+      * pose proof remove_all_cons l a l'.
+        break_or_hyp; break_and; find_rewrite.
+        + pose proof remove_all_cons l a (remove A_eq_dec a0 l').
+          break_or_hyp; break_and; intuition.
+          aggressive_rewrite_goal; auto.
+        + destruct l0; simpl in *; find_injection; intuition.
+          match goal with H0: NoDup _, H1: _ = remove_all _ _ |- _ => specialize (IHl' _ _ _ H0 (eq_sym H1)) end.
+          rewrite <- IHl'.
+          pose proof remove_all_cons l a (remove A_eq_dec a0 l').
+          break_or_hyp; break_and; intuition.
   Qed.
 End remove_all.
 Arguments in_remove_all_was_in : clear implicits.

@@ -694,4 +694,150 @@ Section list_util.
     invc_NoDup.
     eauto 6 using in_firstn with struct_util.
   Qed.
+
+  Lemma NoDup_mid_not_in :
+    forall (a : A) (l l' : list A),
+    NoDup (l ++ a :: l') ->
+    ~ In a (l ++ l').
+  Proof.
+    induction l; intros; simpl in *.
+    - invc_NoDup; auto.
+    - invc_NoDup.
+      intro.
+      break_or_hyp.
+      * match goal with H: ~ In _ _ |- _ => contradict H end.
+        apply in_or_app.
+        right; left. auto.
+      * match goal with H: In _ _ |- _ => contradict H end.
+        eauto.
+    Qed.
+
+  Lemma Permutation_split :
+    forall (ns ns' : list A) (n : A),
+      Permutation (n :: ns) ns' ->
+      exists ns0, exists ns1, ns' = ns0 ++ n :: ns1.
+  Proof.
+    intros l l' a H_pm.
+    assert (In a (a :: l)); auto with datatypes.
+    assert (In a l'); eauto using Permutation_in.
+    find_apply_lem_hyp In_split; auto.
+  Qed.
+
+  Lemma NoDup_app_left :
+    forall (l l' : list A),
+      NoDup (l ++ l') -> NoDup l.
+  Proof.
+    induction l; intros; simpl in *.
+    - apply NoDup_nil.
+    - invc_NoDup.
+      find_apply_hyp_hyp.
+      apply NoDup_cons; auto.
+      intro.
+      match goal with H: ~ In _ _ |- _ => contradict H end.
+      apply in_or_app.
+      left; auto.
+  Qed.
+
+  Lemma NoDup_app_right :
+    forall (l l' : list A),
+      NoDup (l ++ l') -> NoDup l'.
+  Proof.
+    induction l; intros; simpl in *; auto.
+    invc_NoDup.
+    find_apply_hyp_hyp; auto.
+  Qed.
+
+  Lemma NoDup_in_not_in_right :
+    forall (l l' : list A) (a : A),
+      NoDup (l ++ l') -> In a l -> ~ In a l'.
+  Proof.
+    induction l; intros; simpl in *; auto.
+    invc_NoDup.
+    break_or_hyp; eauto with datatypes.
+  Qed.
+
+  Lemma NoDup_in_not_in_left :
+    forall (l l' : list A) (a : A),
+    NoDup (l ++ l') -> In a l' -> ~ In a l.
+  Proof.
+    intros.
+    induction l; simpl in *; auto.
+    invc_NoDup.
+    concludes.
+    intro.
+    break_or_hyp; auto with datatypes.
+  Qed.
+
+  Lemma count_occ_app :
+    forall l l' (a : A),
+      count_occ A_eq_dec (l ++ l') a = count_occ A_eq_dec l a + count_occ A_eq_dec l' a.
+  Proof.
+    intros.
+    induction l; simpl in *; auto.
+    break_if; auto.
+    find_rewrite.
+    auto.
+  Qed.
+
+  Lemma Permutation_map_fst :
+    forall l l' : list (A * B),
+      Permutation l l' ->
+      Permutation (map fst l) (map fst l').
+  Proof.
+    induction l; intros; simpl in *.
+    - find_apply_lem_hyp Permutation_nil.
+      find_rewrite.
+      auto.
+    - assert (In a l').
+        apply Permutation_in with (l := a :: l); auto with datatypes.
+      find_apply_lem_hyp in_split.
+      break_exists.
+      find_rewrite.
+      find_apply_lem_hyp Permutation_cons_app_inv.
+      find_apply_hyp_hyp.
+      find_rewrite.
+      rewrite map_app.
+      simpl.
+      apply Permutation_cons_app.
+      rewrite <- map_app.
+      auto.
+     Qed.
+
+  Lemma snd_eq_not_in_map :
+    forall (l : list (A * B)) n m,
+      (forall nm, In nm l -> snd nm = m) ->
+      ~ In (n, m) l ->
+      ~ In n (map fst l).
+  Proof.
+    intros.
+    induction l; simpl in *; auto.
+    intro.
+    break_or_hyp.
+    - match goal with H: ~ _ |- _ => contradict H end.
+      left.
+      destruct a.
+      match goal with H: forall _ : A * B, _ |- _ => specialize (H (a, b)) end.
+      simpl in *.
+      intuition eauto; repeat find_rewrite; auto.
+    - match goal with H: In _ _ |- _ => contradict H end.
+      apply IHl; eauto.
+  Qed.
+
+  Lemma NoDup_map_snd_fst :
+    forall nms : list (A * B),
+      NoDup nms ->
+      (forall nm nm', In nm nms -> In nm' nms -> snd nm = snd nm') ->
+      NoDup (map fst nms).
+  Proof.
+    intros.
+    induction nms; simpl in *.
+    - apply NoDup_nil.
+    - invc_NoDup.
+      apply NoDup_cons.
+      * assert (forall nm, In nm nms -> snd nm = snd a).
+          intuition eauto.
+        destruct a.
+        apply snd_eq_not_in_map with (m := b); auto.
+      * apply IHnms; auto.
+ Qed.
 End list_util.
