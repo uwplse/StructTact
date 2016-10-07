@@ -699,7 +699,7 @@ Section list_util.
     forall (a : A) (l l' : list A),
     NoDup (l ++ a :: l') ->
     ~ In a (l ++ l').
-  Proof.
+  Proof using.
     induction l; intros; simpl in *.
     - invc_NoDup; auto.
     - invc_NoDup.
@@ -716,7 +716,7 @@ Section list_util.
     forall (ns ns' : list A) (n : A),
       Permutation (n :: ns) ns' ->
       exists ns0, exists ns1, ns' = ns0 ++ n :: ns1.
-  Proof.
+  Proof using.
     intros l l' a H_pm.
     assert (In a (a :: l)); auto with datatypes.
     assert (In a l'); eauto using Permutation_in.
@@ -726,7 +726,7 @@ Section list_util.
   Lemma NoDup_app_left :
     forall (l l' : list A),
       NoDup (l ++ l') -> NoDup l.
-  Proof.
+  Proof using.
     induction l; intros; simpl in *.
     - apply NoDup_nil.
     - invc_NoDup.
@@ -741,7 +741,7 @@ Section list_util.
   Lemma NoDup_app_right :
     forall (l l' : list A),
       NoDup (l ++ l') -> NoDup l'.
-  Proof.
+  Proof using.
     induction l; intros; simpl in *; auto.
     invc_NoDup.
     find_apply_hyp_hyp; auto.
@@ -750,7 +750,7 @@ Section list_util.
   Lemma NoDup_in_not_in_right :
     forall (l l' : list A) (a : A),
       NoDup (l ++ l') -> In a l -> ~ In a l'.
-  Proof.
+  Proof using.
     induction l; intros; simpl in *; auto.
     invc_NoDup.
     break_or_hyp; eauto with datatypes.
@@ -759,7 +759,7 @@ Section list_util.
   Lemma NoDup_in_not_in_left :
     forall (l l' : list A) (a : A),
     NoDup (l ++ l') -> In a l' -> ~ In a l.
-  Proof.
+  Proof using.
     intros.
     induction l; simpl in *; auto.
     invc_NoDup.
@@ -771,7 +771,7 @@ Section list_util.
   Lemma count_occ_app :
     forall l l' (a : A),
       count_occ A_eq_dec (l ++ l') a = count_occ A_eq_dec l a + count_occ A_eq_dec l' a.
-  Proof.
+  Proof using.
     intros.
     induction l; simpl in *; auto.
     break_if; auto.
@@ -783,7 +783,7 @@ Section list_util.
     forall l l' : list (A * B),
       Permutation l l' ->
       Permutation (map fst l) (map fst l').
-  Proof.
+  Proof using.
     induction l; intros; simpl in *.
     - find_apply_lem_hyp Permutation_nil.
       find_rewrite.
@@ -808,7 +808,7 @@ Section list_util.
       (forall nm, In nm l -> snd nm = m) ->
       ~ In (n, m) l ->
       ~ In n (map fst l).
-  Proof.
+  Proof using.
     intros.
     induction l; simpl in *; auto.
     intro.
@@ -828,7 +828,7 @@ Section list_util.
       NoDup nms ->
       (forall nm nm', In nm nms -> In nm' nms -> snd nm = snd nm') ->
       NoDup (map fst nms).
-  Proof.
+  Proof using.
     intros.
     induction nms; simpl in *.
     - apply NoDup_nil.
@@ -839,5 +839,5 @@ Section list_util.
         destruct a.
         apply snd_eq_not_in_map with (m := b); auto.
       * apply IHnms; auto.
- Qed.
+  Qed.
 End list_util.

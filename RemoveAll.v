@@ -95,7 +95,7 @@ Section remove_all.
     forall l l',
     NoDup l' ->
     NoDup (remove_all l l').
-  Proof.
+  Proof using.
     intros.
     induction l'.
     - rewrite remove_all_nil; auto.
@@ -113,7 +113,7 @@ Section remove_all.
      NoDup l' ->
      remove_all l l' = l0 ++ a :: l1 ->
      remove_all l (remove A_eq_dec a l') = l0 ++ l1.
-  Proof.
+  Proof using.
     induction l'; intros; simpl in *.
     - find_rewrite_lem remove_all_nil.
       destruct l0; simpl in *; match goal with H: [] = _ |- _ => contradict H end; auto using nil_cons.

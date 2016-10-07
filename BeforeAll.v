@@ -19,7 +19,7 @@ Section before_all.
       x <> y ->
       before_all x y (y :: l) ->
       ~ In x l.
-  Proof.
+  Proof using.
     intros.
     simpl in *.
     break_or_hyp; auto.
@@ -31,7 +31,7 @@ Section before_all.
     a <> x ->
     before_all x y l ->
     before_all x y (l ++ [a]).
-  Proof.
+  Proof using.
   induction l.
   - intros; left; auto.
   - intros;
@@ -52,7 +52,7 @@ Section before_all.
     forall l (x y a : A),
       ~ In y l ->
       before_all x y (l ++ [a]).
-  Proof.
+  Proof using.
     induction l.
     - intros; left; auto.
     - intros.
@@ -65,7 +65,7 @@ Section before_all.
     forall l (x y : A),
       ~ In x l ->
       before_all x y l.
-  Proof.
+  Proof using.
     intros.
     destruct l; simpl in *; auto.
   Qed.
