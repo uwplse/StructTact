@@ -11,6 +11,11 @@ popd
 case $DOWNSTREAM in
 verdi)
   pushd ..
+    git clone 'http://github.com/palmskog/InfSeqExt'
+    pushd InfSeqExt
+      ./build.sh
+    popd
+
     git clone 'http://github.com/uwplse/verdi'
     pushd verdi
       ./build.sh
