@@ -169,6 +169,23 @@ Section update2.
     assumption.
   Qed.
 
+  Lemma collate_head_head :
+    forall l h n n' (f : A -> A -> list B) a,
+      head (f n' n) = Some a ->
+      head ((collate A_eq_dec h f l) n' n) = Some a.
+  Proof using.
+    induction l; intros; auto.
+    destruct a.
+    simpl.
+    apply IHl.
+    unfold update2.
+    break_if; auto.
+    break_and; subst.
+    destruct (f n' n); auto.
+    find_apply_lem_hyp hd_error_some_nil.
+    intuition.
+  Qed.
+
   Lemma collate_neq :
     forall h n n' ns (f : A -> A -> list B),
       h <> n ->
