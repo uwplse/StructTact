@@ -17,4 +17,4 @@ clean:
 	$(MAKE) -f Makefile.coq clean
 	rm Makefile.coq
 
-.PHONY: default clean
+.PHONY: default clean quick
