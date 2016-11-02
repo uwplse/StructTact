@@ -78,5 +78,15 @@ Lemma equates_6 :
   P y1 x2 x3 x4 x5 x6 -> x1 = y1 -> P x1 x2 x3 x4 x5 x6.
 Proof using. intros. subst. auto. Qed.
 
+Definition prod_eq_dec :
+  forall A B
+    (A_eq_dec : forall x y : A, {x = y} + {x <> y})
+    (B_eq_dec : forall x y : B, {x = y} + {x <> y})
+    (x y : A * B),
+    {x = y} + {x <> y}.
+Proof.
+  decide equality.
+Qed.
+    
 End equatesLemma.
 
