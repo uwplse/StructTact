@@ -4,6 +4,7 @@ Require Import StructTact.StructTactics.
 Require Import StructTact.ListTactics.
 Require Import StructTact.ListUtil.
 Require Import StructTact.RemoveAll.
+Require Import StructTact.PropUtil.
 Require Import FunctionalExtensionality.
 Require Import Sumbool.
 Require Import Sorting.Permutation.
@@ -35,7 +36,166 @@ Definition map2fst {A B : Type} (a : A) := map (fun (b : B) => (a, b)).
 
 Definition map2snd {A B : Type} (b : B) := map (fun (a : A) => (a, b)).
 
-Section update2.
+Section Update2.
+  Variables A B : Type.
+
+  Hypothesis A_eq_dec : forall x y : A, {x = y} + {x <> y}.
+  
+  Lemma update2_diff1 :
+    forall (sigma : A -> A -> B) x y v x' y',
+      x <> x' ->
+      update2 A_eq_dec sigma x y v x' y' = sigma x' y'.
+  Proof using.
+    unfold update2.
+    intros.
+    break_if; intuition congruence.
+  Qed.
+
+  Lemma update2_diff2 :
+    forall (sigma : A -> A -> B) x y v x' y',
+      y <> y' ->
+      update2 A_eq_dec sigma x y v x' y' = sigma x' y'.
+  Proof using.
+    unfold update2.
+    intros.
+    break_if; intuition congruence.
+  Qed.
+
+  Lemma update2_diff_prod :
+    forall (sigma : A -> A -> B) x y v x' y',
+      (x, y) <> (x', y') ->
+      update2 A_eq_dec sigma x y v x' y' = sigma x' y'.
+  Proof using.
+    unfold update2.
+    intros.
+    break_if; intuition congruence.
+  Qed.
+  
+  Lemma update2_nop :
+    forall (sigma : A -> A -> B) x y x' y',
+      update2 A_eq_dec sigma x y (sigma x y) x' y' = sigma x' y'.
+  Proof using.
+    unfold update2.
+    intros. break_if; intuition congruence.
+  Qed.
+
+  Lemma update2_eq :
+    forall (sigma : A -> A -> B) x y x' y' v,
+      x = x' ->
+      y = y' ->
+      update2 A_eq_dec sigma x y v x' y' = v.
+  Proof using.
+    intros. subst.
+    unfold update2.
+    break_if; intuition congruence.
+  Qed.
+
+  Lemma update2_eq_prod :
+    forall (sigma : A -> A -> B) x y x' y' v,
+      (x, y) = (x', y') ->
+      update2 A_eq_dec sigma x y v x' y' = v.
+  Proof using.
+    intros. subst.
+    unfold update2.
+    break_if; intuition congruence.
+  Qed.
+  
+  Lemma update2_same :
+    forall (sigma : A -> A -> B) x y v,
+      update2 A_eq_dec sigma x y v x y = v.
+  Proof using.
+    intros.
+    rewrite update2_eq; auto.
+  Qed.
+
+  Lemma update2_nop_ext :
+    forall (sigma : A -> A -> B) x y,
+      update2 A_eq_dec sigma x y (sigma x y) = sigma.
+  Proof using.
+    intros.
+    do 2 (apply functional_extensionality; intros).
+    apply update2_nop.
+  Qed.
+
+  Lemma update2_nop_ext' :
+    forall (sigma : A -> A -> B) x y v,
+      sigma x y = v ->
+      update2 A_eq_dec sigma x y v = sigma.
+  Proof using.
+    intros.
+    subst.
+    apply update2_nop_ext.
+  Qed.
+
+  Lemma update2_overwrite :
+    forall (sigma : A -> A -> B) x y st st',
+      update2 A_eq_dec (update2 A_eq_dec sigma x y st) x y st' = update2 A_eq_dec sigma x y st'.
+  Proof using.
+    intros.
+    do 2 (apply functional_extensionality; intros).
+    destruct (A_eq_dec x x0);
+      destruct (A_eq_dec y x1).
+    - repeat rewrite update2_eq; auto.
+    - repeat rewrite update2_diff2; auto.
+    - repeat rewrite update2_diff1; auto.
+    - repeat rewrite update2_diff1; auto.
+  Qed.
+
+End Update2.
+
+
+Lemma update2_fun_comm :
+  forall A B C A_eq_dec (f : B -> C) (st : A -> A -> B) x y v x' y',
+    f (update2 A_eq_dec st x y v x' y') = update2 A_eq_dec (fun x y => f (st x y)) x y (f v) x' y'.
+Proof.
+  intros.
+  destruct (prod_eq_dec A_eq_dec A_eq_dec (x, y) (x', y')); subst;
+    repeat first [rewrite update2_diff_prod by congruence |
+                  rewrite update2_eq_prod  by auto ]; auto.
+Qed.
+
+Ltac update2_destruct_goal :=
+  match goal with
+  | [ |- context [ update2 ?eq_dec _ ?x ?y _ ?x' ?y' ] ] =>
+    destruct (prod_eq_dec eq_dec eq_dec (x, y) (x', y'))
+  end.
+
+Ltac update2_destruct_hyp :=
+  match goal with
+  | [ _ : context [ update2 ?eq_dec _ ?x ?y _ ?x' ?y' ] |- _ ] =>
+    destruct (prod_eq_dec eq_dec eq_dec (x, y) (x', y'))
+  end.
+
+Ltac update2_destruct := update2_destruct_goal || update2_destruct_hyp.
+
+Ltac rewrite_update2' H :=
+  first [rewrite update2_diff_prod in H by congruence |
+         rewrite update2_eq_prod in H by auto ].
+
+Ltac rewrite_update2 :=
+  repeat match goal with
+           | [ H : context [ update2 _ _ _ _ _ _ _ ] |- _ ] =>
+             rewrite_update2' H; repeat rewrite_update2' H
+           | [ |- _ ] => repeat (try rewrite update2_diff_prod by congruence;
+                                 try rewrite update2_eq_prod by auto)
+         end.
+
+Ltac destruct_update2 :=
+  repeat (update2_destruct; subst; rewrite_update2).
+
+Ltac destruct_update2_hyp :=
+  repeat ((update2_destruct_hyp || update2_destruct_goal); subst; rewrite_update2).
+
+Ltac update2_destruct_simplify :=
+  update2_destruct; subst; rewrite_update2; simpl in *.
+
+Ltac update2_destruct_simplify_hyp :=
+  update2_destruct_hyp || update2_destruct_goal; subst; rewrite_update2; simpl in *.
+
+Ltac update2_destruct_max_simplify :=
+  update2_destruct; subst_max; rewrite_update2; simpl in *.
+
+Section Update2Rel.
   Variables A B : Type.
   Variable R : relation A.
 
@@ -926,4 +1086,5 @@ Section update2.
       apply Permutation_sym.
       assumption.
   Qed.
-End update2.
+
+End Update2Rel.
