@@ -83,13 +83,14 @@ Section list_util.
       remove A_eq_dec a (xs ++ ys) = remove A_eq_dec a xs ++ remove A_eq_dec a ys.
   Proof.
     intros.
-    prep_induction xs.
+    generalize dependent ys.
     induction xs; intros.
     - tauto.
     - destruct (A_eq_dec a0 a);
       simpl;
       break_if;
       try rewrite <- app_comm_cons;
+      rewrite IHxs; 
       congruence.
   Qed.
 
