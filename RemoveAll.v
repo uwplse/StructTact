@@ -167,11 +167,11 @@ Section remove_all.
     prep_induction xs.
     induction xs; intros.
     - tauto.
-    - destruct (A_eq_dec a0 a) eqn:?H;
-      simpl; repeat find_rewrite.
-      + auto.
-      + rewrite <- app_comm_cons.
-        congruence.
+    - destruct (A_eq_dec a0 a);
+      simpl;
+      break_if;
+      try rewrite <- app_comm_cons;
+      congruence.
   Qed.
 
   Lemma remove_all_app_r :
