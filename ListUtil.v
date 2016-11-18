@@ -78,6 +78,21 @@ Section list_util.
     intros. induction xs; simpl in *; try break_if; intuition congruence.
   Qed.
 
+  Lemma remove_app_comm :
+    forall a xs ys,
+      remove A_eq_dec a (xs ++ ys) = remove A_eq_dec a xs ++ remove A_eq_dec a ys.
+  Proof.
+    intros.
+    prep_induction xs.
+    induction xs; intros.
+    - tauto.
+    - destruct (A_eq_dec a0 a);
+      simpl;
+      break_if;
+      try rewrite <- app_comm_cons;
+      congruence.
+  Qed.
+
   Lemma filter_app : forall (f : A -> bool) xs ys,
       filter f (xs ++ ys) = filter f xs ++ filter f ys.
   Proof using.
