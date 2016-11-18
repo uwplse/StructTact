@@ -143,5 +143,49 @@ Section remove_all.
           pose proof remove_all_cons l a (remove A_eq_dec a0 l').
           break_or_hyp; break_and; intuition.
   Qed.
+
+  Lemma remove_all_app_l :
+    forall xs ys zs,
+      remove_all (xs ++ ys) zs = remove_all xs (remove_all ys zs).
+  Proof using.
+    induction zs; intros.
+    - now repeat rewrite remove_all_nil.
+    - pose proof (remove_all_cons (xs ++ ys) a zs).
+      pose proof (remove_all_cons ys a zs).
+      pose proof (remove_all_cons xs a (remove_all ys zs)).
+      repeat (break_or_hyp; break_and); repeat find_rewrite;
+      try find_eapply_lem_hyp in_app_or;
+      try assert (In a (xs ++ ys)) by (eapply in_or_app; eauto);
+      tauto.
+  Qed.
+
+  Lemma remove_all_app_r :
+    forall xs ys zs,
+      remove_all xs (ys ++ zs) = remove_all xs ys ++ remove_all xs zs.
+  Proof using.
+    induction xs.
+    - auto.
+    - intros.
+      simpl.
+      rewrite remove_app_comm.
+      auto.
+  Qed.
+
+  Lemma remove_all_del_comm :
+    forall xs ys zs,
+      remove_all xs (remove_all ys zs) = remove_all ys (remove_all xs zs).
+  Proof using.
+    intros.
+    induction zs; intros.
+    - now repeat rewrite remove_all_nil.
+    - pose proof (remove_all_cons xs a zs).
+      pose proof (remove_all_cons ys a zs).
+      pose proof (remove_all_cons ys a (remove_all xs zs)).
+      pose proof (remove_all_cons xs a (remove_all ys zs)).
+      repeat (break_or_hyp; break_and);
+        repeat find_rewrite;
+        congruence.
+  Qed.
+
 End remove_all.
 Arguments in_remove_all_was_in : clear implicits.
