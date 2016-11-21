@@ -12,17 +12,17 @@ verdi)
   opam install coq-mathcomp-ssreflect.$SSREFLECT_VERSION --yes --verbose
 
   pushd ..
-    git clone 'http://github.com/palmskog/InfSeqExt'
+    git clone 'https://github.com/DistributedComponents/InfSeqExt.git'
     pushd InfSeqExt
       ./build.sh
     popd
 
-    git clone 'http://github.com/uwplse/verdi'
+    git clone 'https://github.com/uwplse/verdi.git'
     pushd verdi
       ./build.sh
     popd
 
-    git clone 'http://github.com/uwplse/verdi-raft'
+    git clone 'https://github.com/uwplse/verdi-raft.git'
     pushd verdi-raft
       ./build.sh
     popd
