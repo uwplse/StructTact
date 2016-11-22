@@ -2,7 +2,7 @@
 StructTact is a Coq library of "structural tactics" (`StructTactics.v`) as well as
 Coq libraries containing lemmas about lists (`Util.v`) and finite types (`Fin.v`)
 that use the tactics library.
-These files were originally developed in the context of [Verdi](http://github.com/uwplse/verdi),
+These files were originally developed in the context of [Verdi](https://github.com/uwplse/verdi),
 but have since been factored out to make them easier to use in other projects.
 
 If you are interested in using StructTact in a project that does not already
@@ -10,9 +10,9 @@ manage its dependencies, we recommend using [`coqproject.sh`](https://github.com
 
 ## Requirements
 
-[`Coq 8.5`](https://coq.inria.fr/download)
+- [`Coq 8.5`](https://coq.inria.fr/download)
 
-## Build Instructions
+## Building
 
 ```
 ./configure
