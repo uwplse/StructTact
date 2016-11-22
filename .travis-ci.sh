@@ -9,7 +9,7 @@ opam install coq.$COQ_VERSION --yes --verbose
 
 case $DOWNSTREAM in
 verdi)
-  opam install coq-mathcomp-ssreflect.$SSREFLECT_VERSION --yes --verbose
+  opam install coq-mathcomp-ssreflect.$SSREFLECT_VERSION uuidm.0.9.6 --yes --verbose
 
   pushd ..
     git clone 'https://github.com/DistributedComponents/InfSeqExt.git'
