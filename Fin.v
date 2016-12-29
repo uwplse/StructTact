@@ -141,11 +141,11 @@ End NatValue.
 
 Module fin_OT_compat (Import N : NatValue) <: OrderedType.
   Definition t := fin n.
-  Definition eq := eq (A := fin n).
+  Definition eq := @eq (fin n).
   Definition lt := @fin_lt n.
-  Definition eq_refl := eq_refl (A := fin n).
-  Definition eq_sym := eq_sym (A := fin n).
-  Definition eq_trans := eq_trans (A := fin n).
+  Definition eq_refl := @eq_refl (fin n).
+  Definition eq_sym := @eq_sym (fin n).
+  Definition eq_trans := @eq_trans (fin n).
   Definition lt_trans := @fin_lt_trans n.
   Definition lt_not_eq := @fin_lt_not_eq n.
   Definition compare := fin_compare n.
@@ -223,8 +223,8 @@ Fixpoint fin_comparison (n : nat) :
 
 Module fin_OT (Import N : NatValue) <: OrderedType.
   Definition t := fin n.
-  Definition eq := eq (A := fin n).
-  Definition eq_equiv := eq_equivalence (A := fin n).
+  Definition eq := @eq (fin n).
+  Definition eq_equiv := @eq_equivalence (fin n).
   Definition lt := @fin_lt n.
   Definition lt_strorder := fin_lt_strorder n.
   Definition lt_compat := fin_lt_lt_compat n.
