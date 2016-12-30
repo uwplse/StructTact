@@ -1,0 +1,17 @@
+opam-version: "1.2"
+name: "StructTact"
+version: "dev"
+maintainer: "verdi@cs.washington.edu"
+
+homepage: "https://github.com/uwplse/StructTact"
+dev-repo: "https://github.com/uwplse/StructTact.git"
+bug-reports: "https://github.com/uwplse/StructTact/issues"
+license: "BSD"
+
+build: [ [ "./configure" ] [ make "-j%{jobs}%" ] ]
+install: [ make "install" ]
+remove: [ "sh" "-c" "rm -rf '%{lib}%/coq/user-contrib/StructTact'" ]
+depends: [ "coq" {((>= "8.5" & < "8.6~") | (>= "8.6" & < "8.7~"))} ]
+
+tags: [ "keyword:proof automation" "date:2016-12-30"]
+authors: [ "Ryan Doenges <>" "Karl Palmskog <>" "Keith Simmons <>" "James Wilcox <>" "Doug Woos <>"]
