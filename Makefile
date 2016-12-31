@@ -10,6 +10,9 @@ default: Makefile.coq
 quick: Makefile.coq
 	$(MAKE) -f Makefile.coq quick
 
+install: Makefile.coq
+	$(MAKE) -f Makefile.coq install
+
 Makefile.coq: _CoqProject
 	coq_makefile -f _CoqProject -o Makefile.coq
 
