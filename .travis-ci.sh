@@ -1,32 +1,27 @@
-set -e
+set -ev
 
 opam init --yes --no-setup
 eval $(opam config env)
+
 opam repo add coq-released https://coq.inria.fr/opam/released
-opam install coq.$COQ_VERSION --yes --verbose
+opam repo add distributedcomponents http://opam.distributedcomponents.net
+
+opam pin add coq $COQ_VERSION --yes --verbose
 
 ./build.sh
 
 case $DOWNSTREAM in
-verdi)
-  opam install coq-mathcomp-ssreflect.$SSREFLECT_VERSION uuidm.0.9.6 --yes --verbose
-
+verdi-raft)
+  opam install coq-mathcomp-ssreflect.$SSREFLECT_VERSION InfSeqExt verdi-runtime --yes --verbose
   pushd ..
-    git clone 'https://github.com/DistributedComponents/InfSeqExt.git'
-    pushd InfSeqExt
-      ./build.sh
-    popd
-
     git clone 'https://github.com/uwplse/verdi.git'
     pushd verdi
-      ./build.sh
+      StructTact_PATH=../StructTact ./build.sh
     popd
-
     git clone 'https://github.com/uwplse/verdi-raft.git'
     pushd verdi-raft
-      ./build.sh
+      StructTact_PATH=../StructTact Verdi_PATH=../verdi ./build.sh
     popd
   popd
   ;;
 esac
-
