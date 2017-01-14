@@ -24,4 +24,4 @@ clean:
 distclean: clean
 	rm -f _CoqProject
 
-.PHONY: default clean quick distclean
+.PHONY: default clean quick distclean install

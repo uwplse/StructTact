@@ -14,7 +14,7 @@ env:
     - SSREFLECT_VERSION=1.6
   matrix:
     - DOWNSTREAM=none
-    - DOWNSTREAM=verdi
+    - DOWNSTREAM=verdi-raft
 sudo: false
 notifications:
   slack:
