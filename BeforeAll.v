@@ -48,20 +48,7 @@ Section before_all.
       split; auto.
   Qed.
 
-  Lemma before_all_not_in_append : 
-    forall l (x y a : A),
-      ~ In y l ->
-      before_all x y (l ++ [a]).
-  Proof using.
-    induction l.
-    - intros; left; auto.
-    - intros.
-      simpl in *.
-      assert (H_neq: y <> a); auto.
-      assert (H_in: ~ In y l); auto.
-   Qed.
-
-  Lemma before_all_not_in :
+  Lemma before_all_not_in_1 :
     forall l (x y : A),
       ~ In x l ->
       before_all x y l.
@@ -69,4 +56,16 @@ Section before_all.
     intros.
     destruct l; simpl in *; auto.
   Qed.
+
+  Lemma before_all_not_in_2 :
+    forall l (x y : A),
+      ~ In y l ->
+      before_all x y l.
+  Proof using.
+    induction l.
+    - intros. simpl in *. auto.
+    - intros. simpl in *.
+      assert (H_neq: y <> a); auto.
+      assert (H_in: ~ In y l); auto.
+   Qed.
 End before_all.
