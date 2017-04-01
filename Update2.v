@@ -817,6 +817,24 @@ Section Update2Rel.
     intuition. 
   Qed.
 
+  Lemma collate_ls_in_in :
+    forall ns (f : A -> A -> list B) to m x a b,
+      In x (f a b) ->
+      In x (collate_ls A_eq_dec ns f to m a b).
+  Proof.
+    intros.
+    prep_induction ns; induction ns.
+    - auto.
+    - intros.
+      simpl.
+      eapply IHns; eauto.
+      destruct (A_eq_dec a a0), (A_eq_dec to b); subst.
+      + rewrite update2_eq; auto using in_or_app.
+      + rewrite update2_diff2; auto using in_or_app.
+      + rewrite update2_diff1; auto using in_or_app.
+      + rewrite update2_diff1; auto using in_or_app.
+  Qed.
+
   Lemma collate_ls_neq_to : 
     forall ns (f : A -> A -> list B) h mg from to,
       h <> to ->
@@ -904,6 +922,57 @@ Section Update2Rel.
     intuition.
     rewrite (collate_ls_f_eq _ _ _ _ _ _ _ H_eq).
     trivial.
+  Qed.
+
+  Lemma collate_ls_cases :
+    forall s (f : A -> A -> list B) to m a b,
+      collate_ls A_eq_dec s f to m a b = f a b \/
+      exists l,
+        (forall x, In x l -> x = m) /\
+        collate_ls A_eq_dec s f to m a b = f a b ++ l.
+  Proof.
+    intros.
+    generalize dependent f.
+    induction s as [|n s].
+    - auto.
+    - intros.
+      simpl in *.
+      destruct (A_eq_dec b to), (A_eq_dec n a); subst.
+      + specialize (IHs (update2 A_eq_dec f a to (f a to ++ [m])));
+          break_or_hyp.
+        * find_rewrite.
+          rewrite update2_eq; eauto.
+          right; eexists; intuition.
+          find_apply_lem_hyp in_inv;
+            break_or_hyp;
+            [|exfalso]; eauto using in_nil.
+        * break_exists_name l; break_and.
+          repeat find_rewrite.
+          rewrite update2_same.
+          right; exists (m :: l).
+          split.
+          -- intros;
+               find_apply_lem_hyp in_inv;
+               intuition.
+          -- rewrite <- app_assoc; auto.
+      + rewrite collate_ls_neq_update2; auto.
+      + rewrite collate_ls_neq_to, update2_diff2; auto.
+      + rewrite collate_ls_neq_to, update2_diff2; auto.
+  Qed.
+
+  Lemma collate_ls_in_neq_in_before :
+    forall s (f : A -> A -> list B) to m a b x,
+      In x (collate_ls A_eq_dec s f to m a b) ->
+      x <> m ->
+      In x (f a b).
+  Proof.
+    intros.
+    pose proof (collate_ls_cases s f to m a b); break_or_hyp.
+    - now find_rewrite.
+    - break_exists; break_and.
+      find_rewrite.
+    find_apply_lem_hyp in_app_or; break_or_hyp; auto.
+    find_apply_hyp_hyp; congruence.
   Qed.
 
   Lemma collate_ls_not_related :
