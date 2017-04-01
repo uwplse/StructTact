@@ -147,7 +147,7 @@ End Update2.
 Lemma update2_fun_comm :
   forall A B C A_eq_dec (f : B -> C) (st : A -> A -> B) x y v x' y',
     f (update2 A_eq_dec st x y v x' y') = update2 A_eq_dec (fun x y => f (st x y)) x y (f v) x' y'.
-Proof.
+Proof using.
   intros.
   destruct (prod_eq_dec A_eq_dec A_eq_dec (x, y) (x', y')); subst;
     repeat first [rewrite update2_diff_prod by congruence |
@@ -821,9 +821,10 @@ Section Update2Rel.
     forall ns (f : A -> A -> list B) to m x a b,
       In x (f a b) ->
       In x (collate_ls A_eq_dec ns f to m a b).
-  Proof.
+  Proof using.
     intros.
-    prep_induction ns; induction ns.
+    generalize dependent f.
+    induction ns.
     - auto.
     - intros.
       simpl.
@@ -930,7 +931,7 @@ Section Update2Rel.
       exists l,
         (forall x, In x l -> x = m) /\
         collate_ls A_eq_dec s f to m a b = f a b ++ l.
-  Proof.
+  Proof using.
     intros.
     generalize dependent f.
     induction s as [|n s].
@@ -965,7 +966,7 @@ Section Update2Rel.
       In x (collate_ls A_eq_dec s f to m a b) ->
       x <> m ->
       In x (f a b).
-  Proof.
+  Proof using.
     intros.
     pose proof (collate_ls_cases s f to m a b); break_or_hyp.
     - now find_rewrite.
