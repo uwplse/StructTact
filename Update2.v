@@ -539,6 +539,29 @@ Section Update2Rel.
     intuition.
   Qed.
 
+  Lemma collate_map2snd_in_neq_in_before :
+    forall from (f : A -> A -> list B) m dsts a b x,
+      In x (collate A_eq_dec from f (map2snd m dsts) a b) ->
+      x <> m ->
+      In x (f a b).
+  Proof using.
+    intros.
+    generalize dependent f.
+    induction dsts.
+    - auto.
+    - simpl; intros f H_coll.
+      eapply IHdsts in H_coll.
+      destruct (A_eq_dec from a), (A_eq_dec a0 b); subst.
+      + rewrite update2_same in *.
+        find_eapply_lem_hyp in_app_or; break_or_hyp.
+        * assumption.
+        * exfalso;
+          find_eapply_lem_hyp in_inv; break_or_hyp; exfalso; auto.
+      + rewrite update2_diff2 in *; auto.
+      + rewrite update2_diff1 in *; auto.
+      + rewrite update2_diff1 in *; auto.
+  Qed.
+
   Lemma collate_map2snd_not_in :
     forall m n h ns (f : A -> A -> list B),
       ~ In n ns ->
