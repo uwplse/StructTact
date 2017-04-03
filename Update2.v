@@ -444,6 +444,22 @@ Section Update2Rel.
       trivial.
   Qed.
 
+  Lemma collate_not_in_rest :
+    forall h h' l1 l2 (f : A -> A -> list B),
+      ~ In h' (map fst l2) ->
+      collate A_eq_dec h f (l1 ++ l2) h h' = collate A_eq_dec h f l1 h h'.
+  Proof using.
+    intros.
+    rewrite collate_app.
+    revert f.
+    induction l2; intros; simpl in *; auto.
+    break_let.
+    subst_max.
+    simpl in *.
+    assert (H_neq: a0 <> h'); auto.
+    rewrite collate_neq_update2; auto.
+  Qed.
+
   Lemma collate_not_in_mid :
     forall h h' l1 l2 (f : A -> A -> list B) m,
       ~ In h (map fst (l1 ++ l2)) ->
