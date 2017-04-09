@@ -856,4 +856,21 @@ Section list_util.
         apply snd_eq_not_in_map with (m := b); auto.
       * apply IHnms; auto.
   Qed.
+
+  Lemma in_fold_left_by_cons_in :
+    forall (l : list B) (g : B -> A) x acc,
+      In x (fold_left (fun a b => g b :: a) l acc) ->
+      In x acc \/ exists y, In y l /\ x = g y.
+  Proof using A_eq_dec.
+    intros until l.
+    induction l.
+    - auto.
+    - simpl; intros.
+      destruct (A_eq_dec x (g a)); subst.
+      + right; exists a; tauto.
+      + find_apply_lem_hyp IHl.
+        break_or_hyp; [left|right].
+        * find_apply_lem_hyp In_cons_neq; tauto.
+        * break_exists_exists; tauto.
+  Qed.
 End list_util.
