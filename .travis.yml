@@ -9,12 +9,9 @@ addons:
       - opam
       - aspcud
 env:
-  global:
-    - COQ_VERSION=8.5.3
-    - SSREFLECT_VERSION=1.6
   matrix:
-    - DOWNSTREAM=none
-    - DOWNSTREAM=verdi-raft
+    - DOWNSTREAM=none COQ_VERSION=8.5.3 SSREFLECT_VERSION=1.6
+    - DOWNSTREAM=verdi-raft COQ_VERSION=8.6 SSREFLECT_VERSION=1.6.1
 sudo: false
 notifications:
   slack:
