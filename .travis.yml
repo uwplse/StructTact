@@ -10,8 +10,8 @@ addons:
       - aspcud
 env:
   matrix:
-    - DOWNSTREAM=none COQ_VERSION=8.5.3 SSREFLECT_VERSION=1.6
-    - DOWNSTREAM=verdi-raft COQ_VERSION=8.6 SSREFLECT_VERSION=1.6.1
+    - DOWNSTREAM=none COQ_VERSION=8.5.3
+    - DOWNSTREAM=verdi-raft COQ_VERSION=8.6
 sudo: false
 notifications:
   slack:
