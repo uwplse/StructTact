@@ -18,6 +18,30 @@ Ltac inv H := inversion H; subst_max.
 Ltac invc H := inv H; clear H.
 Ltac invcs H := invc H; simpl in *.
 
+(** [inv_prop] finds the first hypothesis including the term [P] and uses [inv]
+    to invert it. *)
+Ltac inv_prop P :=
+  match goal with
+  | [ H : context[P] |- _] =>
+    inv H
+  end.
+
+(** [inv_prop] finds the first hypothesis including the term [P] and uses [invc]
+    to invert it. *)
+Ltac invc_prop P :=
+  match goal with
+  | [ H : context[P] |- _] =>
+    invc H
+  end.
+
+(** [inv_prop] finds the first hypothesis including the term [P] and uses
+    [invcs] to invert it. *)
+Ltac invcs_prop P :=
+  match goal with
+  | [ H : context[P] |- _] =>
+    invcs H
+  end.
+
 (** [break_if] finds instances of [if _ then _ else _] in your goal or
     context, and destructs the discriminee, while retaining the
     information about the discriminee's value leading to the branch
@@ -169,6 +193,22 @@ Ltac forward H :=
 Ltac forwards :=
   match goal with
     | [ H : ?P -> _ |- _ ] => forward H
+  end.
+
+(** [find_elim_prop] finds a hypothesis that includes [P] and eliminates it with
+    the built-in [elim] tactic. *)
+Ltac find_elim_prop P :=
+  match goal with
+  | [ H : context [ P ] |- _ ] =>
+    elim H
+  end.
+
+(** [find_elim_prop] finds a hypothesis that includes [P] and eliminates it with
+    the built-in [eelim] tactic. *)
+Ltac find_eelim_prop P :=
+  match goal with
+  | [ H : context [ P ] |- _ ] =>
+    eelim H
   end.
 
 (** [find_contradiction] solves a goal if two equalities are
@@ -398,6 +438,13 @@ Ltac find_insterU :=
 Ltac eapply_prop P :=
   match goal with
     | H : P _ |- _ =>
+      eapply H
+  end.
+
+(** [find_eapply_prop P] finds a hypothesis including [P] and [eapply]-es it. *)
+Ltac find_eapply_prop P :=
+  match goal with
+    | H : context [ P ] |- _ =>
       eapply H
   end.
 
