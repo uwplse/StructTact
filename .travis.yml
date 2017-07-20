@@ -12,6 +12,7 @@ env:
   matrix:
     - DOWNSTREAM=none COQ_VERSION=8.5.3
     - DOWNSTREAM=verdi-raft COQ_VERSION=8.6
+    - DOWNSTREAM=none COQ_VERSION=8.6.1
 sudo: false
 notifications:
   slack:
