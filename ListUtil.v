@@ -40,6 +40,16 @@ Section list_util.
   Variables A B C : Type.
   Hypothesis A_eq_dec : forall x y : A, {x = y} + {x <> y}.
 
+  Lemma list_neq_cons :
+    forall (l : list A) x,
+      x :: l <> l.
+  Proof using.
+    intuition.
+    symmetry in H.
+    induction l;
+      now inversion H.
+  Qed.
+
   Lemma remove_preserve :
     forall (x y : A) xs,
       x <> y ->
@@ -109,6 +119,28 @@ Section list_util.
     induction xs; intros.
     - auto.
     - simpl. rewrite H by intuition. rewrite IHxs by intuition. auto.
+  Qed.
+
+  Lemma not_in_filter_false :
+    forall (f : A -> bool) l x,
+      In x l ->
+      ~ In x (filter f l) ->
+      f x = false.
+  Proof.
+    intros.
+    destruct (f x) eqn:?H; [|tauto].
+    unfold not in *; find_false.
+    now eapply filter_In.
+  Qed.
+
+  Lemma filter_length_bound :
+    forall f (l : list A),
+      length (filter f l) <= length l.
+  Proof.
+    induction l.
+    - easy.
+    - simpl.
+      break_if; simpl; omega.
   Qed.
 
   Lemma NoDup_map_injective : forall (f : A -> B) xs,
@@ -399,6 +431,23 @@ Section list_util.
     intros. subst. in_crush.
   Qed.
   Hint Resolve app_cons_in_rest : struct_util.
+
+  Lemma in_rest_app_cons:
+    forall (l xs ys : list A) a b,
+      l = xs ++ a :: ys ->
+      In b l ->
+      a <> b ->
+      In b (xs ++ ys).
+  Proof using.
+    intros.
+    subst_max.
+    do_in_app.
+    break_or_hyp.
+    - auto with datatypes.
+    - find_apply_lem_hyp in_inv.
+      break_or_hyp; auto using in_or_app || congruence.
+  Qed.
+  Hint Resolve in_rest_app_cons : struct_util.
 
   Lemma remove_filter_commute :
     forall (l : list A) A_eq_dec f x,
@@ -873,4 +922,31 @@ Section list_util.
         * find_apply_lem_hyp In_cons_neq; tauto.
         * break_exists_exists; tauto.
   Qed.
+
+  Lemma hd_error_tl_exists :
+    forall (l : list A) x,
+      hd_error l = Some x ->
+      exists tl,
+        l = x :: tl.
+  Proof.
+    intros.
+    destruct l; simpl in *.
+    - congruence.
+    - eexists; solve_by_inversion.
+  Qed.
+
+  Lemma hd_error_None :
+    forall (l : list A),
+      hd_error l = None ->
+      l = [].
+  Proof.
+    now destruct l.
+  Qed.
+
 End list_util.
+
+(* We have to repeat these Hint Resolve commands because hints don't survive
+   past the ends of sections *)
+Hint Resolve app_cons_in : struct_util.
+Hint Resolve app_cons_in_rest : struct_util.
+Hint Resolve in_rest_app_cons : struct_util.
