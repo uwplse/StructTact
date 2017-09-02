@@ -4,8 +4,8 @@ StructTact
 [![Build Status](https://api.travis-ci.org/uwplse/StructTact.svg?branch=master)](https://travis-ci.org/uwplse/StructTact)
 
 StructTact is a Coq library of "structural tactics" (`StructTactics.v`) as well as
-libraries containing lemmas about lists (`Util.v`) and finite types (`Fin.v`)
-that use the tactics library.
+libraries containing lemmas about lists (`Util.v`), finite types (`Fin.v`),
+and orders on strings (`StringOrders.v`) that use the tactics library.
 
 These files were originally developed in the context of [Verdi](https://github.com/uwplse/verdi),
 but have since been factored out to make them easier to use in other projects.
@@ -40,12 +40,15 @@ using structural tactics typically includes:
 Require Import StructTact.StructTactics.
 ```
 
+For tactic documentation, see the inline comments in [`StructTactics.v`](StructTactics.v).
+
 The optional utility and finite type definitions and lemmas described below must be included
 separately if needed:
 
 ```coq
 Require Import StructTact.Util.
 Require Import StructTact.Fin.
+Require Import StructTact.StringOrders.
 ```
 
 Structural Tactics
@@ -101,3 +104,13 @@ The following constructions are defined on `fin`:
 * `fin_OT_compat`: legacy `OrderedType` module for `fin n` (for use with `FMap`)
 * `fin_OT`: modern `OrderedType` module for `fin n` (for use with `MSet`)
 * `fin_of_nat`: convert a `nat` to a `fin n`, when possible
+
+String Orders
+-------------
+
+This file contains some order relations on strings, in particular a total lexicographic order.
+
+The following modules are defined:
+
+* `string_lex_as_OT_compat`: legacy `OrderedType` module for `string` (for use with `FMap`)
+* `string_lex_as_OT`: modern `OrderedType` module for `string` (for use with `MSet`)

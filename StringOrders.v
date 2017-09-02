@@ -217,9 +217,9 @@ refine
        match string_comparison_lex s'0 s'1 with
        | exist _ cmp H_cmp => 
          match cmp as cmp0 return (cmp = cmp0 -> _) with
-         | Lt => fun (H_cmp_eq : _ ) => exist _ Lt _
-         | Eq => fun (H_cmp_eq : _ ) => exist _ Eq _
-         | Gt => fun (H_cmp_eq : _ ) => exist _ Gt _
+         | Lt => fun H_cmp_eq => exist _ Lt _
+         | Eq => fun H_cmp_eq => exist _ Eq _
+         | Gt => fun H_cmp_eq => exist _ Gt _
          end (refl_equal _)
        end
      | inright H_dec => exist _ Gt _
