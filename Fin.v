@@ -3,6 +3,7 @@ Import ListNotations.
 Require Import StructTact.StructTactics.
 Require Import StructTact.ListUtil.
 Require Import OrderedType.
+Require Import OrderedTypeEx.
 
 Set Implicit Arguments.
 
@@ -139,7 +140,7 @@ Module Type NatValue.
   Parameter n : nat.
 End NatValue.
 
-Module fin_OT_compat (Import N : NatValue) <: OrderedType.
+Module fin_OT_compat (Import N : NatValue) <: UsualOrderedType.
   Definition t := fin n.
   Definition eq := @eq (fin n).
   Definition lt := @fin_lt n.
@@ -221,7 +222,7 @@ Fixpoint fin_comparison (n : nat) :
              end
   end.
 
-Module fin_OT (Import N : NatValue) <: OrderedType.
+Module fin_OT (Import N : NatValue) <: UsualOrderedType.
   Definition t := fin n.
   Definition eq := @eq (fin n).
   Definition eq_equiv := @eq_equivalence (fin n).
