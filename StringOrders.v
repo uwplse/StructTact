@@ -134,41 +134,46 @@ Proof.
   trivial.
 Qed.
 
-Fixpoint string_compare_lex (s0 s1 : string) : Compare lex_lt eq s0 s1.
+Fixpoint string_compare_lex_compat (s0 s1 : string) : Compare lex_lt eq s0 s1.
 refine
-  (match s0 as ss0, s1 as ss1 return (s0 = ss0 -> s1 = ss1 -> _) with 
+  (match s0 as ss0, s1 as ss1 return (_ = ss0 -> _ = ss1 -> _) with
    | EmptyString, EmptyString => fun H_eq H_eq' => EQ _
    | EmptyString, String c' s'1 => fun H_eq H_eq' => LT _
    | String c s'0, EmptyString => fun H_eq H_eq' => GT _
-   | String c s'0, String c' s'1 => fun H_eq H_eq' => 
-     match lt_eq_lt_dec (nat_of_ascii c) (nat_of_ascii c') with
-     | inleft (left H_dec) => LT _
-     | inleft (right H_dec) => 
-       match string_compare_lex s'0 s'1 with
+   | String c s'0, String c' s'1 => fun H_eq H_eq' =>
+     match Nat.compare (nat_of_ascii c) (nat_of_ascii c') as cmp return (_ = cmp -> _) with
+     | Lt => fun H_eq_cmp => LT _
+     | Eq => fun H_eq_cmp =>
+       match string_compare_lex_compat s'0 s'1 with
        | LT H_lt => LT _
        | EQ H_eq_lex => EQ _
        | GT H_gt => GT _
        end
-     | inright H_dec => GT _
-     end
+     | Gt => fun H_eq_cmp => GT _
+     end (refl_equal _)
    end (refl_equal _) (refl_equal _)); rewrite H_eq; rewrite H_eq'; auto.
 - apply lex_lt_empty.
 - apply lex_lt_empty.
-- apply lex_lt_lt.
+- apply nat_compare_eq in H_eq_cmp.
+  apply nat_of_ascii_injective in H_eq_cmp.
+  rewrite H_eq_cmp.
+  apply lex_lt_eq.
   assumption.
-- apply nat_of_ascii_injective in H_dec.
-  rewrite H_dec.
-  apply lex_lt_eq.
-  auto.
-- apply nat_of_ascii_injective in H_dec.
-  rewrite H_dec; rewrite H_eq_lex.
+- apply nat_compare_eq in H_eq_cmp.
+  apply nat_of_ascii_injective in H_eq_cmp.
+  subst.
   reflexivity.
-- apply nat_of_ascii_injective in H_dec.
-  rewrite H_dec.
+- apply nat_compare_eq in H_eq_cmp.
+  apply nat_of_ascii_injective in H_eq_cmp.
+  rewrite H_eq_cmp.
   apply lex_lt_eq.
-  auto.
-- apply lex_lt_lt.
-  auto.
+  assumption.
+- apply nat_compare_lt in H_eq_cmp.
+  apply lex_lt_lt.
+  assumption.
+- apply nat_compare_gt in H_eq_cmp.
+  apply lex_lt_lt.
+  auto with arith.
 Defined.
 
 Module string_lex_as_OT_compat <: UsualOrderedType.
@@ -180,7 +185,7 @@ Module string_lex_as_OT_compat <: UsualOrderedType.
   Definition eq_trans := @eq_trans string.
   Definition lt_trans := lex_lt_trans.
   Definition lt_not_eq := lex_lt_not_eq.
-  Definition compare := string_compare_lex.
+  Definition compare := string_compare_lex_compat.
   Definition eq_dec := string_dec.
 End string_lex_as_OT_compat.
 
@@ -204,59 +209,62 @@ intros s0 s1 H_eq s2 s3 H_eq'.
 split; intro H_imp; subst; auto.
 Qed.
 
-Fixpoint string_comparison_lex (s0 s1 : string) : { cmp : comparison | CompSpec eq lex_lt s0 s1 cmp }.
+Fixpoint string_compare_lex (s0 s1 : string) : { cmp : comparison | CompSpec eq lex_lt s0 s1 cmp }.
 refine
-  (match s0 as ss0, s1 as ss1 return (s0 = ss0 -> s1 = ss1 -> _) with 
+  (match s0 as ss0, s1 as ss1 return (_ = ss0 -> _ = ss1 -> _) with
    | EmptyString, EmptyString => fun H_eq H_eq' => exist _ Eq _
    | EmptyString, String c' s'1 => fun H_eq H_eq' => exist _ Lt _
    | String c s'0, EmptyString => fun H_eq H_eq' => exist _ Gt _
-   | String c s'0, String c' s'1 => fun H_eq H_eq' => 
-     match lt_eq_lt_dec (nat_of_ascii c) (nat_of_ascii c') with
-     | inleft (left H_dec) => exist _ Lt _
-     | inleft (right H_dec) => 
-       match string_comparison_lex s'0 s'1 with
-       | exist _ cmp H_cmp => 
-         match cmp as cmp0 return (cmp = cmp0 -> _) with
-         | Lt => fun H_cmp_eq => exist _ Lt _
-         | Eq => fun H_cmp_eq => exist _ Eq _
-         | Gt => fun H_cmp_eq => exist _ Gt _
+   | String c s'0, String c' s'1 => fun H_eq H_eq' =>
+     match Nat.compare (nat_of_ascii c) (nat_of_ascii c') as cmp return (_ = cmp -> _)  with
+     | Lt => fun H_eq_cmp => exist _ Lt _
+     | Eq => fun H_eq_cmp =>
+       match string_compare_lex s'0 s'1 with
+       | exist _ cmp H_cmp' =>
+         match cmp as cmp0 return (_ = cmp0 -> _) with
+         | Lt => fun H_eq_cmp0 => exist _ Lt _
+         | Eq => fun H_eq_cmp0 => exist _ Eq _
+         | Gt => fun H_eq_cmp0 => exist _ Gt _
          end (refl_equal _)
        end
-     | inright H_dec => exist _ Gt _
-     end
+     | Gt => fun H_eq_cmp => exist _ Gt _
+     end (refl_equal _)
    end (refl_equal _) (refl_equal _)); rewrite H_eq; rewrite H_eq'.
 - apply CompEq; auto.
 - apply CompLt.
   apply lex_lt_empty.
 - apply CompGt.
   apply lex_lt_empty.
-- apply CompLt.
-  apply lex_lt_lt.
-  auto.
-- rewrite H_cmp_eq in H_cmp.
+- apply nat_compare_eq in H_eq_cmp.
+  apply nat_of_ascii_injective in H_eq_cmp.
+  rewrite H_eq_cmp0 in H_cmp'.
+  inversion H_cmp'; subst.
   apply CompEq.
-  apply nat_of_ascii_injective in H_dec.
-  rewrite H_dec.
-  inversion H_cmp.
-  rewrite H.
   reflexivity.
-- rewrite H_cmp_eq in H_cmp. 
+- apply nat_compare_eq in H_eq_cmp.
+  apply nat_of_ascii_injective in H_eq_cmp.
+  rewrite H_eq_cmp0 in H_cmp'.
+  inversion H_cmp'.
+  subst.
   apply CompLt.
-  apply nat_of_ascii_injective in H_dec.
-  rewrite H_dec.
-  inversion H_cmp.
   apply lex_lt_eq.
   assumption.
-- rewrite H_cmp_eq in H_cmp. 
+- apply nat_compare_eq in H_eq_cmp.
+  apply nat_of_ascii_injective in H_eq_cmp.
+  rewrite H_eq_cmp0 in H_cmp'.
+  subst.
+  inversion H_cmp'.
   apply CompGt.
-  apply nat_of_ascii_injective in H_dec.
-  rewrite H_dec.
-  inversion H_cmp.
   apply lex_lt_eq.
   assumption.
-- apply CompGt.
+- apply nat_compare_lt in H_eq_cmp.
+  apply CompLt.
   apply lex_lt_lt.
   assumption.
+- apply nat_compare_gt in H_eq_cmp.
+  apply CompGt.
+  apply lex_lt_lt.
+  auto with arith.
 Defined.
 
 Module string_lex_as_OT <: UsualOrderedType.
@@ -266,7 +274,7 @@ Module string_lex_as_OT <: UsualOrderedType.
   Definition lt := lex_lt.
   Definition lt_strorder := lex_lt_strorder.
   Definition lt_compat := lex_lt_lt_compat.
-  Definition compare := fun x y => proj1_sig (string_comparison_lex x y).
-  Definition compare_spec := fun x y => proj2_sig (string_comparison_lex x y).
+  Definition compare := fun x y => proj1_sig (string_compare_lex x y).
+  Definition compare_spec := fun x y => proj2_sig (string_compare_lex x y).
   Definition eq_dec := string_dec.
 End string_lex_as_OT.
