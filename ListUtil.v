@@ -923,6 +923,35 @@ Section list_util.
         * break_exists_exists; tauto.
   Qed.
 
+  Lemma fold_left_for_each_not_in :
+    forall (f : A -> B -> A) (g : A -> B -> C),
+      (forall a b b',
+          b <> b' ->
+          g (f a b') b = g a b) ->
+      forall l a b,
+        ~ In b l ->
+        g (fold_left f l a) b = g a b.
+  Proof using A B C.
+    induction l as [| b' l']; simpl in *; auto.
+    - intros. intuition.
+      rewrite IHl'; auto.
+  Qed.
+
+  Lemma fold_left_for_each_in :
+    forall (f : A -> B -> A) (g : A -> B -> C) (B_eq_dec : forall x y : B, {x = y} + {x <> y}),
+      (forall a b b',
+          b <> b' ->
+          g (f a b') b = g a b) ->
+      forall l a b,
+        In b l ->
+        exists a',
+          g (fold_left f l a) b = g (f a' b) b.
+  Proof using A B C.
+    induction l as [|b' l']; simpl in *; intuition; subst.
+    destruct (in_dec B_eq_dec b l'); intuition.
+    find_eapply_lem_hyp fold_left_for_each_not_in; eauto.
+  Qed.
+
   Lemma hd_error_tl_exists :
     forall (l : list A) x,
       hd_error l = Some x ->
