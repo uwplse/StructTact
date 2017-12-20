@@ -5,14 +5,13 @@ addons:
     sources:
       - avsm
     packages:
-      - ocaml
       - opam
       - aspcud
 env:
   matrix:
     - DOWNSTREAM=none COQ_VERSION=8.5.3
     - DOWNSTREAM=verdi-raft COQ_VERSION=8.6.1
-    - DOWNSTREAM=none COQ_VERSION=8.7.0
+    - DOWNSTREAM=none COQ_VERSION=8.7.1
 sudo: false
 notifications:
   slack:
