@@ -1,12 +1,12 @@
+#!/usr/bin/env bash
+
 set -ev
 
-opam init --yes --no-setup
+export DOWNSTREAM=$1
+
 eval $(opam config env)
 
-opam repo add coq-released https://coq.inria.fr/opam/released
-opam repo add distributedcomponents-dev http://opam-dev.distributedcomponents.net
-
-opam pin add coq ${COQ_VERSION} --yes
+opam update
 
 opam pin add StructTact . --yes --verbose
 
