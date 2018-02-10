@@ -20,13 +20,6 @@ Proof.
   - break_or_hyp; try find_apply_hyp_hyp; intuition.
 Qed.
 
-Lemma seq_NoDup : forall n a,
-    NoDup (seq a n).
-Proof.
-  induction n; intros; simpl in *; constructor; auto.
-  intro. apply seq_range in H. omega.
-Qed.
-
 Lemma plus_gt_0 :
   forall a b,
     a + b > 0 ->
