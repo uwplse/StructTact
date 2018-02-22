@@ -6,6 +6,9 @@ Require Import Sorting.Permutation.
 Require Import StructTact.StructTactics.
 Require Import StructTact.ListTactics.
 
+Require Import Hammer.Hammer.
+Require Import Hammer.Reconstr.
+
 Set Implicit Arguments.
 
 Notation member := (in_dec eq_nat_dec).
@@ -15,9 +18,7 @@ Lemma seq_range :
     In x (seq a n) ->
     a <= x < a + n.
 Proof.
-  induction n; intros; simpl in *.
-  - intuition.
-  - break_or_hyp; try find_apply_hyp_hyp; intuition.
+Reconstr.hobvious Reconstr.Empty (@Coq.Lists.List.in_seq) Reconstr.Empty.
 Qed.
 
 Lemma plus_gt_0 :
@@ -25,8 +26,7 @@ Lemma plus_gt_0 :
     a + b > 0 ->
     a > 0 \/ b > 0.
 Proof.
-  intros.
-  destruct (eq_nat_dec a 0); intuition.
+Reconstr.hobvious Reconstr.Empty (@Coq.Arith.PeanoNat.Nat.add_0_r, @Coq.Arith.Gt.gt_0_eq) (@Coq.Init.Peano.gt).
 Qed.
 
 Section list_util.
@@ -37,10 +37,7 @@ Section list_util.
     forall (l : list A) x,
       x :: l <> l.
   Proof using.
-    intuition.
-    symmetry in H.
-    induction l;
-      now inversion H.
+    induction l; sauto.
   Qed.
 
   Lemma remove_preserve :
@@ -49,11 +46,7 @@ Section list_util.
       In y xs ->
       In y (remove A_eq_dec x xs).
   Proof using.
-    induction xs; intros.
-    - intuition.
-    - simpl in *.
-      concludes.
-      intuition; break_if; subst; try congruence; intuition.
+    induction xs; sauto.
   Qed.
 
   Lemma in_remove :
@@ -61,16 +54,14 @@ Section list_util.
       In y (remove A_eq_dec x xs) ->
       In y xs.
   Proof using.
-    induction xs; intros.
-    - auto.
-    - simpl in *. break_if; simpl in *; intuition.
+    induction xs; sauto.
   Qed.
 
   Lemma remove_partition :
     forall xs (p : A) ys,
       remove A_eq_dec p (xs ++ p :: ys) = remove A_eq_dec p (xs ++ ys).
   Proof using.
-    induction xs; intros; simpl; break_if; congruence.
+    induction xs; sauto.
   Qed.
 
   Lemma remove_not_in :
@@ -78,40 +69,27 @@ Section list_util.
       ~ In x xs ->
       remove A_eq_dec x xs = xs.
   Proof using.
-    intros. induction xs; simpl in *; try break_if; intuition congruence.
+    induction xs; sauto.
   Qed.
 
   Lemma remove_app_comm :
     forall a xs ys,
       remove A_eq_dec a (xs ++ ys) = remove A_eq_dec a xs ++ remove A_eq_dec a ys.
   Proof.
-    intros.
-    generalize dependent ys.
-    induction xs; intros.
-    - tauto.
-    - destruct (A_eq_dec a0 a);
-      simpl;
-      break_if;
-      try rewrite <- app_comm_cons;
-      rewrite IHxs; 
-      congruence.
+    induction xs; sauto.
   Qed.
 
   Lemma filter_app : forall (f : A -> bool) xs ys,
       filter f (xs ++ ys) = filter f xs ++ filter f ys.
   Proof using.
-    induction xs; intros.
-    - auto.
-    - simpl. rewrite IHxs. break_if; auto.
+    induction xs; sauto.
   Qed.
 
   Lemma filter_fun_ext_eq : forall f g xs,
       (forall a : A, In a xs -> f a = g a) ->
       filter f xs = filter g xs.
   Proof using.
-    induction xs; intros.
-    - auto.
-    - simpl. rewrite H by intuition. rewrite IHxs by intuition. auto.
+    induction xs; scrush.
   Qed.
 
   Lemma not_in_filter_false :
@@ -120,20 +98,18 @@ Section list_util.
       ~ In x (filter f l) ->
       f x = false.
   Proof.
-    intros.
-    destruct (f x) eqn:?H; [|tauto].
-    unfold not in *; find_false.
-    now eapply filter_In.
+    sauto.
+    destruct (f x) eqn:?H; sauto.
+    contradict H0.
+    apply filter_In; sauto.
   Qed.
 
   Lemma filter_length_bound :
     forall f (l : list A),
       length (filter f l) <= length l.
   Proof.
-    induction l.
-    - easy.
-    - simpl.
-      break_if; simpl; omega.
+    induction l; sauto.
+    omega.
   Qed.
 
   Lemma NoDup_map_injective : forall (f : A -> B) xs,
@@ -141,13 +117,10 @@ Section list_util.
               f x = f y -> x = y) ->
       NoDup xs -> NoDup (map f xs).
   Proof using.
-    induction xs; intros.
-    - constructor.
-    - simpl. invc_NoDup. constructor.
-      + intro. do_in_map.
-        assert (x = a) by intuition.
-        congruence.
-      + intuition.
+    induction xs; sauto.
+    invc_NoDup. constructor; sauto.
+    assert (x = a) by intuition.
+    ycrush.
   Qed.
 
   Lemma NoDup_disjoint_append :
@@ -157,11 +130,8 @@ Section list_util.
       (forall a, In a l -> ~ In a l') ->
       NoDup (l ++ l').
   Proof using.
-    induction l; intros.
-    - auto.
-    - simpl. invc_NoDup. constructor.
-      + intro. do_in_app. intuition eauto with *.
-      + intuition eauto with *.
+    induction l; sauto.
+    invc_NoDup. constructor; sauto; ycrush.
   Qed.
 
   Lemma filter_NoDup :
@@ -169,11 +139,8 @@ Section list_util.
       NoDup l ->
       NoDup (filter p l).
   Proof using.
-    induction l; intros.
-    - auto.
-    - invc_NoDup. simpl. break_if; auto.
-      constructor; auto.
-      intro. apply filter_In in H. intuition.
+    induction l; sauto.
+    Reconstr.heasy (@H, @H2) (@Coq.Lists.List.filter_In, @Coq.Lists.List.NoDup_cons) Reconstr.Empty.
   Qed.
 
   Lemma NoDup_map_filter :
