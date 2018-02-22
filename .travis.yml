@@ -8,8 +8,6 @@ env:
   global:
     - THIS_REPO=StructTact
   matrix:
-    - DOWNSTREAM=none COQ_VERSION=coq8.5-32bit
-    - DOWNSTREAM=verdi-raft COQ_VERSION=coq8.6-32bit
     - DOWNSTREAM=none COQ_VERSION=coq8.7-32bit
 
 # The "docker run" command will pull if needed.

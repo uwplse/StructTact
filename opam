@@ -13,7 +13,10 @@ build: [
 ]
 install: [ make "install" ]
 remove: [ "sh" "-c" "rm -rf '%{lib}%/coq/user-contrib/StructTact'" ]
-depends: [ "coq" {((>= "8.5" & < "8.6~") | (>= "8.6" & < "8.7~") | (>= "8.7" & < "8.8~"))} ]
+depends: [
+  "coq" {>= "8.7" & < "8.8~"}
+  "coqhammer" {= "dev"}
+]
 
 tags: [ "keyword:proof automation" ]
 authors: [

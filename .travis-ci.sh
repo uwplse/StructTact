@@ -6,6 +6,8 @@ export DOWNSTREAM=$1
 
 eval $(opam config env)
 
+opam repo add proofengineering-dev http://opam-dev.proofengineering.org
+
 opam update
 
 opam pin add StructTact . --yes --verbose
