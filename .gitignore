@@ -9,3 +9,4 @@ Makefile.coq.conf
 *.aux
 *.vio
 _CoqProject
+.coqdeps.d
