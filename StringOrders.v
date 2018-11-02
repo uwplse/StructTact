@@ -151,7 +151,7 @@ refine
        end
      | Gt => fun H_eq_cmp => GT _
      end (refl_equal _)
-   end (refl_equal _) (refl_equal _)); rewrite H_eq; rewrite H_eq'; auto.
+   end (refl_equal _) (refl_equal _)); try (rewrite H_eq; rewrite H_eq'); auto.
 - apply lex_lt_empty.
 - apply lex_lt_empty.
 - apply nat_compare_eq in H_eq_cmp.
@@ -216,52 +216,52 @@ refine
    | EmptyString, String c' s'1 => fun H_eq H_eq' => exist _ Lt _
    | String c s'0, EmptyString => fun H_eq H_eq' => exist _ Gt _
    | String c s'0, String c' s'1 => fun H_eq H_eq' =>
-     match Nat.compare (nat_of_ascii c) (nat_of_ascii c') as cmp return (_ = cmp -> _)  with
-     | Lt => fun H_eq_cmp => exist _ Lt _
-     | Eq => fun H_eq_cmp =>
+     match Nat.compare (nat_of_ascii c) (nat_of_ascii c') as cmp0 return (_ = cmp0 -> _)  with
+     | Lt => fun H_eq_cmp0 => exist _ Lt _
+     | Eq => fun H_eq_cmp0 =>
        match string_compare_lex s'0 s'1 with
        | exist _ cmp H_cmp' =>
-         match cmp as cmp0 return (_ = cmp0 -> _) with
-         | Lt => fun H_eq_cmp0 => exist _ Lt _
-         | Eq => fun H_eq_cmp0 => exist _ Eq _
-         | Gt => fun H_eq_cmp0 => exist _ Gt _
+         match cmp as cmp1 return (cmp = cmp1 -> _) with
+         | Lt => fun H_eq_cmp1 => exist _ Lt _
+         | Eq => fun H_eq_cmp1 => exist _ Eq _
+         | Gt => fun H_eq_cmp1 => exist _ Gt _
          end (refl_equal _)
        end
-     | Gt => fun H_eq_cmp => exist _ Gt _
+     | Gt => fun H_eq_cmp0 => exist _ Gt _
      end (refl_equal _)
-   end (refl_equal _) (refl_equal _)); rewrite H_eq; rewrite H_eq'.
+   end (refl_equal _) (refl_equal _)); try (rewrite H_eq; rewrite H_eq').
 - apply CompEq; auto.
 - apply CompLt.
   apply lex_lt_empty.
 - apply CompGt.
   apply lex_lt_empty.
-- apply nat_compare_eq in H_eq_cmp.
-  apply nat_of_ascii_injective in H_eq_cmp.
-  rewrite H_eq_cmp0 in H_cmp'.
+- apply nat_compare_eq in H_eq_cmp0.
+  apply nat_of_ascii_injective in H_eq_cmp0.
+  rewrite H_eq_cmp1 in H_cmp'.
   inversion H_cmp'; subst.
   apply CompEq.
   reflexivity.
-- apply nat_compare_eq in H_eq_cmp.
-  apply nat_of_ascii_injective in H_eq_cmp.
-  rewrite H_eq_cmp0 in H_cmp'.
+- apply nat_compare_eq in H_eq_cmp0.
+  apply nat_of_ascii_injective in H_eq_cmp0.
+  rewrite H_eq_cmp1 in H_cmp'.
   inversion H_cmp'.
   subst.
   apply CompLt.
   apply lex_lt_eq.
   assumption.
-- apply nat_compare_eq in H_eq_cmp.
-  apply nat_of_ascii_injective in H_eq_cmp.
-  rewrite H_eq_cmp0 in H_cmp'.
+- apply nat_compare_eq in H_eq_cmp0.
+  apply nat_of_ascii_injective in H_eq_cmp0.
+  rewrite H_eq_cmp1 in H_cmp'.
   subst.
   inversion H_cmp'.
   apply CompGt.
   apply lex_lt_eq.
   assumption.
-- apply nat_compare_lt in H_eq_cmp.
+- apply nat_compare_lt in H_eq_cmp0.
   apply CompLt.
   apply lex_lt_lt.
   assumption.
-- apply nat_compare_gt in H_eq_cmp.
+- apply nat_compare_gt in H_eq_cmp0.
   apply CompGt.
   apply lex_lt_lt.
   auto with arith.

@@ -745,8 +745,8 @@ Section list_util.
   Qed.
 
   Lemma firstn_NoDup : forall n (xs : list A),
-      NoDup xs ->
-      NoDup (firstn n xs).
+    NoDup xs ->
+    NoDup (firstn n xs).
   Proof using.
     induction n; intros; simpl; destruct xs; auto with struct_util.
     invc_NoDup.
