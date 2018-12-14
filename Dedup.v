@@ -20,8 +20,8 @@ Section dedup.
                    x :: tail
     end.
 
-  Lemma dedup_eliminates_duplicates : forall (a : A) b c,
-      (dedup (a :: b ++ a :: c) = dedup (b ++ a :: c)).
+  Lemma dedup_eliminates_duplicates : forall a l l',
+      dedup (a :: l ++ a :: l') = dedup (l ++ a :: l').
   Proof using.
     intros. simpl in *.
     break_match.
