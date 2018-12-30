@@ -12,14 +12,6 @@ Fixpoint before {A: Type} (x : A) y l : Prop :=
       (a <> y /\ before x y l')
   end.
 
-Fixpoint before_func {A: Type} (f : A -> bool) (g : A -> bool) (l : list A) : Prop :=
-  match l with
-  | [] => False
-  | a :: l' =>
-    f a = true \/
-    (g a = false /\ before_func f g l')
-  end.
-
 Section before.
   Variable A : Type.
 
@@ -55,23 +47,6 @@ Section before.
       before x y (xs ++ y :: ys).
   Proof using.
     induction xs; intros; simpl in *; intuition.
-  Qed.
-
-  Definition before_func_dec :
-    forall f g (l : list A),
-      {before_func f g l} + {~ before_func f g l}.
-  Proof using.
-    intros. induction l; simpl in *.
-    - intuition.
-    - destruct (f a); destruct (g a); intuition.
-  Qed.
-
-  Lemma before_func_app :
-    forall f g l x,
-      before_func (A := A) f g l ->
-      before_func f g (l ++ x).
-  Proof using.
-    intros. induction l; simpl in *; intuition.
   Qed.
 
   Lemma before_2_3_insert :
