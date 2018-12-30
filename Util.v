@@ -3,6 +3,7 @@ Require Export StructTact.ListUtil.
 
 Require Export StructTact.Assoc.
 Require Export StructTact.Before.
+Require Export StructTact.BeforeFunc.
 Require Export StructTact.BeforeAll.
 Require Export StructTact.Dedup.
 Require Export StructTact.FilterMap.

@@ -14,6 +14,13 @@ Fixpoint Prefix {A} (l1 : list A) l2 : Prop :=
 Section prefix.
   Variable A : Type.
 
+  Lemma Prefix_refl :
+    forall (l : list A),
+      Prefix l l.
+  Proof using.
+    intros. induction l; simpl in *; auto.
+  Qed.
+
   Lemma Prefix_nil :
     forall (l : list A),
       Prefix l [] ->
@@ -35,7 +42,7 @@ Section prefix.
   Lemma Prefix_in :
     forall (l l' : list A),
       Prefix l' l ->
-      (forall x, In x l' -> In x l).
+      forall x, In x l' -> In x l.
   Proof using.
     induction l; intros l' H.
     - find_apply_lem_hyp Prefix_nil. subst. contradiction.
@@ -65,5 +72,17 @@ Section prefix.
   Proof using.
     induction l; intros; simpl in *; intuition;
       subst; break_match; intuition; subst; intuition.
+  Qed.
+
+  Lemma Prefix_exists_rest :
+    forall (l1 l2 : list A),
+      Prefix l1 l2 ->
+      exists rest,
+        l2 = l1 ++ rest.
+  Proof using.
+    induction l1; intros; simpl in *; eauto.
+    break_match; intuition. subst.
+    find_apply_hyp_hyp.
+    break_exists_exists. subst. auto.
   Qed.
 End prefix.

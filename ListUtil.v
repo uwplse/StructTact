@@ -164,6 +164,26 @@ Section list_util.
       + intuition eauto with *.
   Qed.
 
+  Lemma NoDup_map_partition :
+    forall (f : A -> B) xs l y zs xs' y' zs',
+      NoDup (map f l) ->
+      l = xs ++ y :: zs ->
+      l = xs' ++ y' :: zs' ->
+      f y = f y' ->
+      xs = xs'.
+  Proof using.
+    induction xs; simpl; intros; destruct xs'.
+    - auto.
+    - subst. simpl in *. find_inversion.
+      invc H. exfalso. rewrite map_app in *. simpl in *.
+      repeat find_rewrite. intuition.
+    - subst. simpl in *. find_inversion.
+      invc H. exfalso. rewrite map_app in *. simpl in *.
+      repeat find_rewrite. intuition.
+    - subst. simpl in *. find_injection. intros. subst.
+      f_equal. eapply IHxs; eauto. solve_by_inversion.
+  Qed.
+
   Lemma filter_NoDup :
     forall p (l : list A),
       NoDup l ->
