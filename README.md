@@ -16,7 +16,7 @@ manage its dependencies, we recommend using [`coqproject.sh`](https://github.com
 Requirements
 ------------
 
-- [`Coq`](https://coq.inria.fr) (8.5, 8.6, 8.7, or 8.8)
+- [`Coq`](https://coq.inria.fr) (8.5, 8.6, 8.7, 8.8, or 8.9)
 
 Building
 --------
