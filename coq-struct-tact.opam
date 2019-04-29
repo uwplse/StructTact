@@ -1,0 +1,36 @@
+opam-version: "2.0"
+version: "dev"
+maintainer: "palmskog@gmail.com"
+
+homepage: "https://github.com/uwplse/StructTact"
+dev-repo: "git+https://github.com/uwplse/StructTact.git"
+bug-reports: "https://github.com/uwplse/StructTact/issues"
+license: "BSD-2-Clause"
+synopsis: "A Coq library of \"structural tactics\" and utility lemmas about lists and finite types"
+description: """
+A Coq library of \"structural tactics\" as well as Coq libraries containing
+lemmas about lists and finite types that use the tactics library.
+"""
+
+build: [
+  [ "./configure" ]
+  [ make "-j%{jobs}%" ]
+]
+install: [ make "install" ]
+depends: [
+  "ocaml"
+  "coq" {(>= "8.5" & < "8.10~") | (= "dev")}
+]
+
+tags: [
+  "category:Computer Science/Data Types and Data Structures"
+  "keyword:proof automation"
+  "logpath:StructTact"
+]
+authors: [
+  "Ryan Doenges"
+  "Karl Palmskog"
+  "Keith Simmons"
+  "James R. Wilcox"
+  "Doug Woos"
+]

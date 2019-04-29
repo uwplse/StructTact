@@ -16,7 +16,7 @@ manage its dependencies, we recommend using [`coqproject.sh`](https://github.com
 Requirements
 ------------
 
-- [`Coq`](https://coq.inria.fr) (8.5, 8.6, 8.7, 8.8, or 8.9)
+- [`Coq`](https://coq.inria.fr) (8.5 or later)
 
 Building
 --------
@@ -24,8 +24,8 @@ Building
 The easiest way to install StructTact is via [OPAM](http://opam.ocaml.org/doc/Install.html):
 
 ```
-opam repo add distributedcomponents-dev http://opam-dev.distributedcomponents.net
-opam install StructTact
+opam repo add coq-extra-dev https://coq.inria.fr/opam/extra-dev
+opam install coq-struct-tact
 ```
 
 To build StructTact manually, first run `./configure` in the root directory, and then run `make`.
