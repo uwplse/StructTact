@@ -10,8 +10,8 @@ and orders on strings (`StringOrders.v`) that use the tactics library.
 These files were originally developed in the context of [Verdi](https://github.com/uwplse/verdi),
 but have since been factored out to make them easier to use in other projects.
 
-If you are interested in using StructTact in a project that does not already
-manage its dependencies, we recommend using [`coqproject.sh`](https://github.com/dwoos/coqproject).
+If you want to use StructTact in a project that does not already
+manage its dependencies, we recommend using [`coqproject.sh`](https://github.com/DistributedComponents/coqproject).
 
 Requirements
 ------------
