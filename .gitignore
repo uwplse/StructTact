@@ -4,9 +4,12 @@
 Makefile.coq
 Makefile.coq.bak
 Makefile.coq.conf
+.Makefile.coq.d
 *~
 .coq-native/
 *.aux
 *.vio
+*.vos
+*.vok
 _CoqProject
 .coqdeps.d
