@@ -1,0 +1,22 @@
+-Q theories StructTact
+
+theories/Fin.v
+theories/Util.v
+theories/Update.v
+theories/BeforeAll.v
+theories/BeforeFunc.v
+theories/PropUtil.v
+theories/FilterMap.v
+theories/RemoveAll.v
+theories/ListUtil.v
+theories/Subseq.v
+theories/Nth.v
+theories/Assoc.v
+theories/StringOrders.v
+theories/Dedup.v
+theories/StructTactics.v
+theories/Update2.v
+theories/Before.v
+theories/ListTactics.v
+theories/Prefix.v
+theories/BoolUtil.v
