@@ -1,4 +1,1 @@
 #!/usr/bin/env bash
-
-NAMESPACE__="StructTact"
-source coqproject.sh

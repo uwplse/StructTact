@@ -1,60 +1,61 @@
-StructTact
-==========
+# StructTact
 
-[![Build Status](https://api.travis-ci.org/uwplse/StructTact.svg?branch=master)](https://travis-ci.org/uwplse/StructTact)
+[![Travis][travis-shield]][travis-link]
 
-StructTact is a Coq library of "structural tactics" (`StructTactics.v`) as well as
-libraries containing lemmas about lists (`Util.v`), finite types (`Fin.v`),
-and orders on strings (`StringOrders.v`) that use the tactics library.
+[travis-shield]: https://travis-ci.org/uwplse/StructTact.svg?branch=master
+[travis-link]: https://travis-ci.org/uwplse/StructTact/builds
 
-These files were originally developed in the context of [Verdi](https://github.com/uwplse/verdi),
-but have since been factored out to make them easier to use in other projects.
 
-If you want to use StructTact in a project that does not already
-manage its dependencies, we recommend using [`coqproject.sh`](https://github.com/DistributedComponents/coqproject).
 
-Requirements
-------------
 
-- [`Coq`](https://coq.inria.fr) (8.5 or later)
+StructTact is a Coq library of structural tactics as well as lemmas about
+lists, finite types, and orders on strings that use the tactics.
 
-Building
---------
+## Meta
 
-The easiest way to install StructTact is via [OPAM](http://opam.ocaml.org/doc/Install.html):
+- Author(s):
+  - Ryan Doenges
+  - Karl Palmskog
+  - Keith Simmons (initial)
+  - James R. Wilcox (initial)
+  - Doug Woos (initial)
+- License: [BSD 2-Clause "Simplified" license](LICENSE)
+- Compatible Coq versions: 8.7 or later
+- Additional dependencies: none
+- Coq namespace: `StructTact`
+- Related publication(s):
+  - [Verdi: A Framework for Implementing and Verifying Distributed Systems](http://verdi.uwplse.org/verdi.pdf) doi:[10.1145/2737924.2737958](https://doi.org/10.1145/2737924.2737958)
 
-```
+## Building and installation instructions
+
+The easiest way to install the latest released version of StructTact
+is via [OPAM](https://opam.ocaml.org/doc/Install.html):
+
+```shell
 opam repo add coq-extra-dev https://coq.inria.fr/opam/extra-dev
 opam install coq-struct-tact
 ```
 
-To build StructTact manually, first run `./configure` in the root directory, and then run `make`.
+To instead build and install manually, do:
 
-Usage
------
-
-The default namespace for the library files is `StructTact`. Hence, a Coq development
-using structural tactics typically includes:
-
-```coq
-Require Import StructTact.StructTactics.
+``` shell
+git clone https://github.com/uwplse/StructTact.git
+cd StructTact
+make   # or make -j <number-of-cores-on-your-machine>
+make install
 ```
 
-For tactic documentation, see the inline comments in [`StructTactics.v`](StructTactics.v).
 
-The optional utility and finite type definitions and lemmas described below must be included
-separately if needed:
+## Documentation
 
-```coq
-Require Import StructTact.Util.
-Require Import StructTact.Fin.
-Require Import StructTact.StringOrders.
-```
+StructTact consists mainly of files originally developed as part of
+the [Verdi framework][verdi-link], which have here been adapted for easier
+reuse in other projects.
 
-Structural Tactics
-------------------
+### Structural tactics
 
-Structural tactics are named by analogy to the structural properties of
+The structural tactics are found in the file `StructTactics.v`,
+and are named by analogy to the structural properties of
 simple type systems: weakening, exchange, and contraction.
 In the context of proof assistants, these are analogous to the ability to add
 new hypotheses in the context, reorder existing hypotheses, and delete
@@ -67,50 +68,51 @@ Structural tactics restore these properties at the level of Ltac by enabling a
 style of proof where hypothesis names are never mentioned. When automatically
 generated names change during proof development, structural tactics still work.
 
-Util
-----
+For tactic documentation, see the inline comments in `StructTactics.v`.
 
-This file collects definitions, lemmas, and tactics about lists, booleans, propositions, and
+### Utility definitions and lemmas
+
+The file `Util.v` collects definitions, lemmas, and tactics about lists, booleans, propositions, and
 functions that were useful in other projects. Notably, the following files are exported:
 
-* `BoolUtil.v`: general boolean lemmas, tactics, and definitions
-* `PropUtil.v`: general lemmas about propositions and sum types
-* `Update.v`: function `update` that modifies a function to return a new value for a specific argument
-* `Update2.v`: function `update2` that modifies a function to return a new value for specific pair of arguments
-* `ListTactics.v`: tactics operating on contexts with `map`, `NoDup`, and `In`
-* `ListUtil.v`: general list lemmas, involving, e.g., `NoDup`, `map`, `filter`, and `firstn`
-* `Assoc.v`: association lists with get, set, and delete functions
-* `Before.v`: relation `before` capturing when an element appears before another in a list
-* `Dedup.v`: function `dedup` remove duplicates from a list using decidable equality
-* `FilterMap.v`: function `filterMap` that maps a partial function on a list and ignores failures
-* `Nth.v`: relation `Nth` capturing the element at some position in a list
-* `Prefix.v`: relation `Prefix` capturing when one list is a prefix of another
-* `RemoveAll.v`: function `remove_all` which removes all elements of one list from another; set subtraction
-* `Subseq.v`: relation `subseq` capturing when one list is a subsequence of another
+- `BoolUtil.v`: general boolean lemmas, tactics, and definitions
+- `PropUtil.v`: general lemmas about propositions and sum types
+- `Update.v`: function `update` that modifies a function to return a new value for a specific argument
+- `Update2.v`: function `update2` that modifies a function to return a new value for specific pair of arguments
+- `ListTactics.v`: tactics operating on contexts with `map`, `NoDup`, and `In`
+- `ListUtil.v`: general list lemmas, involving, e.g., `NoDup`, `map`, `filter`, and `firstn`
+- `Assoc.v`: association lists with get, set, and delete functions
+- `Before.v`: relation `before` capturing when an element appears before another in a list
+- `Dedup.v`: function `dedup` remove duplicates from a list using decidable equality
+- `FilterMap.v`: function `filterMap` that maps a partial function on a list and ignores failures
+- `Nth.v`: relation `Nth` capturing the element at some position in a list
+- `Prefix.v`: relation `Prefix` capturing when one list is a prefix of another
+- `RemoveAll.v`: function `remove_all` which removes all elements of one list from another; set subtraction
+- `Subseq.v`: relation `subseq` capturing when one list is a subsequence of another
 
-Fin
----
+### Finite types
 
-This file contains an definitions and lemmas related to `fin n`, a type with `n` elements,
+The file `Fin.v` contains definitions and lemmas related to `fin n`, a type with `n` elements,
 isomorphic to `Fin.t n` from the standard library, but with a slightly different
 definition that is more convenient to work with.
 
 The following constructions are defined on `fin`:
 
-* `fin_eq_dec`: decidable equality
-* `all_fin n`: list of all elements of `fin n`
-* `fin_to_nat`: convert a `fin n` to a `nat`
-* `fin_lt`: an ordering on `fin n`, implemented using `fin_to_nat`
-* `fin_OT_compat`: legacy `OrderedType` module for `fin n` (for use with `FMap`)
-* `fin_OT`: modern `OrderedType` module for `fin n` (for use with `MSet`)
-* `fin_of_nat`: convert a `nat` to a `fin n`, when possible
+- `fin_eq_dec`: decidable equality
+- `all_fin n`: list of all elements of `fin n`
+- `fin_to_nat`: convert a `fin n` to a `nat`
+- `fin_lt`: an ordering on `fin n`, implemented using `fin_to_nat`
+- `fin_OT_compat`: legacy `OrderedType` module for `fin n` (for use with `FMap`)
+- `fin_OT`: modern `OrderedType` module for `fin n` (for use with `MSet`)
+- `fin_of_nat`: convert a `nat` to a `fin n`, when possible
 
-String Orders
--------------
+### String orders
 
-This file contains some order relations on strings, in particular a total lexicographic order.
+The file `StringOrders.v` contains some order relations on strings, in particular a total lexicographic order.
 
 The following modules are defined:
 
-* `string_lex_as_OT_compat`: legacy `OrderedType` module for `string` (for use with `FMap`)
-* `string_lex_as_OT`: modern `OrderedType` module for `string` (for use with `MSet`)
+- `string_lex_as_OT_compat`: legacy `OrderedType` module for `string` (for use with `FMap`)
+- `string_lex_as_OT`: modern `OrderedType` module for `string` (for use with `MSet`)
+
+[verdi-link]: https://github.com/uwplse/verdi

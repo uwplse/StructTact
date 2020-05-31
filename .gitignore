@@ -11,5 +11,4 @@ Makefile.coq.conf
 *.vio
 *.vos
 *.vok
-_CoqProject
 .coqdeps.d

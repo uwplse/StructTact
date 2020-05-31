@@ -1,0 +1,4 @@
+(coq.theory
+ (name StructTact)
+ (package coq-struct-tact)
+ (synopsis "Coq library of structural tactics and utility lemmas about lists and finite types"))
