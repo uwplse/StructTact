@@ -21,5 +21,9 @@ pkgs.stdenv.mkDerivation {
 
   src = if shell then null else ./.;
 
+  preConfigure = ''
+    patchShebangs configure
+  '';
+
   installFlags = "COQMF_COQLIB=$(out)/lib/coq/${coq.coq-version}/";
 }
