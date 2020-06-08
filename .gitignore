@@ -12,3 +12,4 @@ Makefile.coq.conf
 *.vos
 *.vok
 .coqdeps.d
+.lia.cache

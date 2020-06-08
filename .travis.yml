@@ -47,6 +47,9 @@ jobs:
     - COQ=https://github.com/coq/coq-on-cachix/tarball/master
     <<: *NIX
   - env:
+    - COQ=https://github.com/coq/coq-on-cachix/tarball/v8.12
+    <<: *NIX
+  - env:
     - COQ=8.11
     <<: *NIX
   - env:
