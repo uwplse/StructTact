@@ -1,15 +1,18 @@
 # StructTact
 
-[![Travis][travis-shield]][travis-link]
+[![CI][action-shield]][action-link]
 
-[travis-shield]: https://travis-ci.org/uwplse/StructTact.svg?branch=master
-[travis-link]: https://travis-ci.org/uwplse/StructTact/builds
+[action-shield]: https://github.com/uwplse/StructTact/workflows/CI/badge.svg?branch=master
+[action-link]: https://github.com/uwplse/StructTact/actions?query=workflow%3ACI
 
 
 
 
 StructTact is a Coq library of structural tactics as well as lemmas about
 lists, finite types, and orders on strings that use the tactics.
+The structural tactics enable a style of proof where hypothesis names
+are never mentioned. When automatically generated names change during
+proof development, structural tactics will still work.
 
 ## Meta
 
@@ -28,23 +31,20 @@ lists, finite types, and orders on strings that use the tactics.
 
 ## Building and installation instructions
 
-The easiest way to install the latest released version of StructTact
-is via [OPAM](https://opam.ocaml.org/doc/Install.html):
-
+The easiest way to install StructTact is via
+[OPAM](https://opam.ocaml.org/doc/Install.html):
 ```shell
 opam repo add coq-extra-dev https://coq.inria.fr/opam/extra-dev
 opam install coq-struct-tact
 ```
 
 To instead build and install manually, do:
-
 ``` shell
 git clone https://github.com/uwplse/StructTact.git
 cd StructTact
 make   # or make -j <number-of-cores-on-your-machine>
 make install
 ```
-
 
 ## Documentation
 

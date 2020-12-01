@@ -10,12 +10,15 @@ license: "BSD-2-Clause"
 synopsis: "Coq library of structural tactics and utility lemmas about lists and finite types"
 description: """
 StructTact is a Coq library of structural tactics as well as lemmas about
-lists, finite types, and orders on strings that use the tactics."""
+lists, finite types, and orders on strings that use the tactics.
+The structural tactics enable a style of proof where hypothesis names
+are never mentioned. When automatically generated names change during
+proof development, structural tactics will still work."""
 
 build: ["dune" "build" "-p" name "-j" jobs]
 depends: [
-  "dune" {>= "2.4"}
-  "coq" {(>= "8.7" & < "8.13~") | (= "dev")}
+  "dune" {>= "2.5"}
+  "coq" {(>= "8.7" & < "8.14~") | (= "dev")}
 ]
 
 tags: [
