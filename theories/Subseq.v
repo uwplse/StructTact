@@ -1,4 +1,4 @@
-Require Import Omega.
+Require Import Lia.
 Require Import List.
 Import ListNotations.
 Require Import StructTact.StructTactics.
@@ -112,7 +112,7 @@ Section subseq.
       intuition eauto using f_equal2, subseq_cons_drop.
     exfalso.
     repeat find_apply_lem_hyp subseq_length.
-    simpl in *. omega.
+    simpl in *. lia.
   Qed.
 
   Lemma subseq_filter :

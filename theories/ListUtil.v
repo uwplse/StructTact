@@ -1,5 +1,6 @@
 Require Import Arith.
-Require Import Omega.
+Require Import Lia.
+Require Import ZArith.
 Require Import List.
 Import ListNotations.
 Require Import Sorting.Permutation.
@@ -133,7 +134,7 @@ Section list_util.
     induction l.
     - easy.
     - simpl.
-      break_if; simpl; omega.
+      break_if; simpl; lia.
   Qed.
 
   Lemma NoDup_map_injective : forall (f : A -> B) xs,
@@ -338,7 +339,7 @@ Section list_util.
       concludes.
 
       forward IHxs.
-      rewrite app_length in *. simpl in *. omega.
+      rewrite app_length in *. simpl in *. lia.
       concludes.
 
       do_in_app. simpl in *. intuition.
@@ -364,7 +365,7 @@ Section list_util.
       + rewrite <- minus_n_O.
         subst.
         rewrite remove_length_not_in; auto.
-      + simpl. concludes. omega.
+      + simpl. concludes. lia.
   Qed.
 
   Lemma remove_length_le :
@@ -375,7 +376,7 @@ Section list_util.
     - auto.
     - simpl in *.
       specialize (IHxs eq_dec).
-      break_if; subst; simpl; omega.
+      break_if; subst; simpl; lia.
   Qed.
 
   Lemma remove_length_lt :
@@ -387,9 +388,9 @@ Section list_util.
     - subst.
       break_if; try congruence.
       pose proof remove_length_le x xs eq_dec.
-      omega.
+      lia.
     - specialize (IHxs ltac:(eauto) ltac:(eauto)).
-      break_if; subst; simpl; omega.
+      break_if; subst; simpl; lia.
   Qed.
 
   Lemma subset_length :
@@ -399,7 +400,7 @@ Section list_util.
       length ys >= length xs.
   Proof using A_eq_dec.
     induction xs; intros.
-    - simpl. omega.
+    - simpl. lia.
     - specialize (IHxs (remove A_eq_dec a ys)).
       invc_NoDup.
       concludes.
@@ -412,7 +413,7 @@ Section list_util.
       pose proof remove_length_lt a ys A_eq_dec.
       conclude_using intuition.
 
-      simpl. omega.
+      simpl. lia.
   Qed.
 
   Lemma app_cons_singleton_inv :
@@ -656,9 +657,9 @@ Section list_util.
     induction l.
     intros.
     + simpl in *. find_apply_lem_hyp plus_gt_0. intuition.
-      * destruct sub1; simpl in *; [omega|].
+      * destruct sub1; simpl in *; [lia|].
         specialize (H a). intuition.
-      * destruct sub2; simpl in *; [omega|].
+      * destruct sub2; simpl in *; [lia|].
         specialize (H0 a). intuition.
     + intros. simpl in *.
       destruct (in_dec A_eq_dec a sub1);
@@ -678,7 +679,7 @@ Section list_util.
                    | H : In a ?sub |- _ =>
                      assert (length (remove A_eq_dec a sub) >= length sub - 1)
                        by eauto using remove_length_ge; clear H
-                   end; omega.
+                   end; lia.
   Qed.
 
   Lemma snoc_assoc :
