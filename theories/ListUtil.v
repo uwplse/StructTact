@@ -990,6 +990,6 @@ End list_util.
 
 (* We have to repeat these Hint Resolve commands because hints don't survive
    past the ends of sections *)
-Hint Resolve app_cons_in : struct_util.
-Hint Resolve app_cons_in_rest : struct_util.
-Hint Resolve in_rest_app_cons : struct_util.
+#[global] Hint Resolve app_cons_in : struct_util.
+#[global] Hint Resolve app_cons_in_rest : struct_util.
+#[global] Hint Resolve in_rest_app_cons : struct_util.

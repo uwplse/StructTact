@@ -45,4 +45,4 @@ Ltac in_crush := repeat (in_crush_start; in_crush_finish).
 
 Create HintDb struct_util.
 
-Hint Constructors NoDup : struct_util.
+#[global] Hint Constructors NoDup : struct_util.
