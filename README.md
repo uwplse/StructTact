@@ -23,7 +23,7 @@ proof development, structural tactics will still work.
   - James R. Wilcox (initial)
   - Doug Woos (initial)
 - License: [BSD 2-Clause "Simplified" license](LICENSE)
-- Compatible Coq versions: 8.7 or later
+- Compatible Coq versions: 8.9 or later
 - Additional dependencies: none
 - Coq namespace: `StructTact`
 - Related publication(s):
