@@ -1,9 +1,13 @@
+<!---
+This file was generated from `meta.yml`, please do not edit manually.
+Follow the instructions on https://github.com/coq-community/templates to regenerate.
+--->
 # StructTact
 
-[![CI][action-shield]][action-link]
+[![Docker CI][docker-action-shield]][docker-action-link]
 
-[action-shield]: https://github.com/uwplse/StructTact/workflows/CI/badge.svg?branch=master
-[action-link]: https://github.com/uwplse/StructTact/actions?query=workflow%3ACI
+[docker-action-shield]: https://github.com/uwplse/StructTact/workflows/Docker%20CI/badge.svg?branch=master
+[docker-action-link]: https://github.com/uwplse/StructTact/actions?query=workflow:"Docker%20CI"
 
 
 

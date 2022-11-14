@@ -5,7 +5,7 @@ opam_name: coq-struct-tact
 organization: uwplse
 community: false
 action: true
-dune: true
+dune: false
 coqdoc: false
 
 synopsis: Coq library of structural tactics and utility lemmas about lists and finite types
@@ -48,13 +48,14 @@ license:
 
 supported_coq_versions:
   text: 8.9 or later
-  opam: '{(>= "8.9" & < "8.16~") | (= "dev")}'
+  opam: '{>= "8.9"}'
 
 tested_coq_nix_versions:
 - version_or_url: https://github.com/coq/coq-on-cachix/tarball/master
 
 tested_coq_opam_versions:
 - version: dev
+- version: '8.16'
 - version: '8.15'
 - version: '8.14'
 - version: '8.13'
