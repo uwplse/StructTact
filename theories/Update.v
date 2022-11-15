@@ -1,5 +1,5 @@
-Require Import StructTact.StructTactics.
-Require Import FunctionalExtensionality.
+From StructTact Require Import StructTactics.
+From Coq Require Import FunctionalExtensionality.
 
 Definition update {A B : Type} (A_eq_dec : forall x y : A, {x = y} + {x <> y}) st h (v : B) := 
   fun nm => if A_eq_dec nm h then v else st nm.

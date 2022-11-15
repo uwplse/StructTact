@@ -1,7 +1,6 @@
-Require Import List.
+From Coq Require Import List.
+From StructTact Require Import StructTactics ListTactics.
 Import ListNotations.
-Require Import StructTact.StructTactics.
-Require Import StructTact.ListTactics.
 
 Fixpoint before_all {A : Type} (x : A) y l : Prop :=
   match l with

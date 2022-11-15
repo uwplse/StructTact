@@ -1,8 +1,6 @@
-Require Import List.
+From Coq Require Import List.
+From StructTact Require Import StructTactics Before Prefix.
 Import ListNotations.
-Require Import StructTact.StructTactics.
-Require Import StructTact.Before.
-Require Import StructTact.Prefix.
 
 Set Implicit Arguments.
 

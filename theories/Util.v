@@ -1,19 +1,19 @@
-Require Export StructTact.ListTactics.
-Require Export StructTact.ListUtil.
+From StructTact Require Export ListTactics.
+From StructTact Require Export ListUtil.
 
-Require Export StructTact.Assoc.
-Require Export StructTact.Before.
-Require Export StructTact.BeforeFunc.
-Require Export StructTact.BeforeAll.
-Require Export StructTact.Dedup.
-Require Export StructTact.FilterMap.
-Require Export StructTact.Nth.
-Require Export StructTact.Prefix.
-Require Export StructTact.RemoveAll.
-Require Export StructTact.Subseq.
+From StructTact Require Export Assoc.
+From StructTact Require Export Before.
+From StructTact Require Export BeforeFunc.
+From StructTact Require Export BeforeAll.
+From StructTact Require Export Dedup.
+From StructTact Require Export FilterMap.
+From StructTact Require Export Nth.
+From StructTact Require Export Prefix.
+From StructTact Require Export RemoveAll.
+From StructTact Require Export Subseq.
 
-Require Export StructTact.BoolUtil.
-Require Export StructTact.PropUtil.
+From StructTact Require Export BoolUtil.
+From StructTact Require Export PropUtil.
 
-Require Export StructTact.Update.
-Require Export StructTact.Update2.
+From StructTact Require Export Update.
+From StructTact Require Export Update2.

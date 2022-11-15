@@ -1,10 +1,7 @@
-Require Import Lia.
-Require Import List.
+From Coq Require Import List Lia.
+From StructTact Require Import StructTactics ListTactics.
+From StructTact Require Import FilterMap RemoveAll.
 Import ListNotations.
-Require Import StructTact.StructTactics.
-Require Import StructTact.ListTactics.
-Require Import StructTact.FilterMap.
-Require Import StructTact.RemoveAll.
 
 Set Implicit Arguments.
 

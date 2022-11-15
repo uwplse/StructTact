@@ -1,9 +1,7 @@
-Require Import List.
+From Coq Require Import List.
+From StructTact Require Import StructTactics ListUtil.
+From Coq Require Import OrderedType OrderedTypeEx.
 Import ListNotations.
-Require Import StructTact.StructTactics.
-Require Import StructTact.ListUtil.
-Require Import OrderedType.
-Require Import OrderedTypeEx.
 
 Set Implicit Arguments.
 
@@ -153,7 +151,7 @@ Module fin_OT_compat (Import N : NatValue) <: UsualOrderedType.
   Definition eq_dec := fin_eq_dec n.
 End fin_OT_compat.
 
-Require Import Orders.
+From Coq Require Import Orders.
 
 Lemma fin_lt_irrefl : 
   forall n, Irreflexive (@fin_lt n).
