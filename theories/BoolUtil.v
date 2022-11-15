@@ -1,7 +1,7 @@
-Require Import Arith.
-Require Import List.
+From Coq Require Import Arith.
+From Coq Require Import List.
+From StructTact Require Import StructTactics.
 Import ListNotations.
-Require Import StructTact.StructTactics.
 
 Set Implicit Arguments.
 

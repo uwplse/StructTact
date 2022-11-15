@@ -151,7 +151,7 @@ Module fin_OT_compat (Import N : NatValue) <: UsualOrderedType.
   Definition eq_dec := fin_eq_dec n.
 End fin_OT_compat.
 
-Require Import Orders.
+From Coq Require Import Orders.
 
 Lemma fin_lt_irrefl : 
   forall n, Irreflexive (@fin_lt n).

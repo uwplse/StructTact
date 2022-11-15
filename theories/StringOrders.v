@@ -185,7 +185,7 @@ Module string_lex_as_OT_compat <: UsualOrderedType.
   Definition eq_dec := string_dec.
 End string_lex_as_OT_compat.
 
-Require Import Orders.
+From Coq Require Import Orders.
 
 Lemma lex_lt_irrefl : Irreflexive lex_lt.
 Proof.
