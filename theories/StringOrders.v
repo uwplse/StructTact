@@ -1,10 +1,6 @@
-Require Import String.
-Require Import Ascii.
-Require Import Arith.
-Require Import OrderedType.
-Require Import OrderedTypeEx.
-
-Require Import StructTact.StructTactics.
+From Coq Require Import String Ascii Arith.
+From Coq Require Import OrderedType OrderedTypeEx.
+From StructTact Require Import StructTactics.
 
 Inductive lex_lt: string -> string -> Prop :=
 | lex_lt_lt : forall (c1 c2 : ascii) (s1 s2 : string),

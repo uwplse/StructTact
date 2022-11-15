@@ -1,9 +1,7 @@
-Require Import List.
+From Coq Require Import List.
+From StructTact Require Import StructTactics ListUtil.
+From StructTact Require Import ListTactics Before.
 Import ListNotations.
-Require Import StructTact.StructTactics.
-Require Import StructTact.ListUtil.
-Require Import StructTact.ListTactics.
-Require Import StructTact.Before.
 
 Set Implicit Arguments.
 

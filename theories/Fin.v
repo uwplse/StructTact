@@ -1,9 +1,7 @@
-Require Import List.
+From Coq Require Import List.
+From StructTact Require Import StructTactics ListUtil.
+From Coq Require Import OrderedType OrderedTypeEx.
 Import ListNotations.
-Require Import StructTact.StructTactics.
-Require Import StructTact.ListUtil.
-Require Import OrderedType.
-Require Import OrderedTypeEx.
 
 Set Implicit Arguments.
 

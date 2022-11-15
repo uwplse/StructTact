@@ -1,4 +1,4 @@
-Require Import StructTact.StructTactics.
+From StructTact Require Import StructTactics.
 
 Set Implicit Arguments.
 

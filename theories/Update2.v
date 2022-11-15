@@ -1,15 +1,11 @@
-Require Import List.
+From Coq Require Import List.
+From StructTact Require Import StructTactics.
+From StructTact Require Import ListTactics ListUtil.
+From StructTact Require Import RemoveAll PropUtil.
+From Coq Require Import FunctionalExtensionality.
+From Coq Require Import Sumbool Sorting.Permutation.
+From Coq Require Import Relation_Definitions RelationClasses.
 Import ListNotations.
-Require Import StructTact.StructTactics.
-Require Import StructTact.ListTactics.
-Require Import StructTact.ListUtil.
-Require Import StructTact.RemoveAll.
-Require Import StructTact.PropUtil.
-Require Import FunctionalExtensionality.
-Require Import Sumbool.
-Require Import Sorting.Permutation.
-Require Import Relation_Definitions.
-Require Import RelationClasses.
 
 Definition update2 {A B : Type} (A_eq_dec : forall x y : A, {x = y} + {x <> y}) (f : A -> A -> B) (x y : A) (v : B) :=
   fun x' y' => if sumbool_and _ _ _ _ (A_eq_dec x x') (A_eq_dec y y') then v else f x' y'.

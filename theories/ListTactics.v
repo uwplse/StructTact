@@ -1,5 +1,5 @@
-Require Import List.
-Require Import StructTact.StructTactics.
+From Coq Require Import List.
+From StructTact Require Import StructTactics.
 
 Ltac do_in_map :=
   match goal with
