@@ -31,8 +31,8 @@ Qed.
 
 Ltac do_bool :=
   repeat match goal with
-    | [ H : beq_nat _ _ = true |- _ ] => apply beq_nat_true in H
-    | [ H : beq_nat _ _ = false |- _ ] => apply beq_nat_false in H
+    | [ H : Nat.eqb _ _ = true |- _ ] => apply Nat.eqb_eq in H
+    | [ H : Nat.eqb _ _ = false |- _ ] => apply Nat.eqb_neq in H
     | [ H : andb _ _ = true |- _ ] => apply Bool.andb_true_iff in H
     | [ H : andb _ _ = false |- _ ] => apply Bool.andb_false_iff in H
     | [ H : orb _ _ = true |- _ ] => apply Bool.orb_prop in H
@@ -46,8 +46,8 @@ Ltac do_bool :=
     | [ |- andb _ _ = false ] => apply Bool.andb_false_iff
     | [ |- leb _ _ = true ] => apply leb_correct
     | [ |-  _ <> false ] => apply Bool.not_false_iff_true
-    | [ |- beq_nat _ _ = false ] => apply beq_nat_false_iff
-    | [ |- beq_nat _ _ = true ] => apply beq_nat_true_iff
+    | [ |- Nat.eqb _ _ = false ] => apply Nat.eqb_neq
+    | [ |- Nat.eqb _ _ = true ] => apply Nat.eqb_eq
   end.
 
 Definition null {A : Type} (xs : list A) : bool :=
