@@ -236,9 +236,9 @@ Section list_util.
     - auto.
     - simpl.
       break_if.
-      + subst. repeat find_rewrite. eauto with *.
-      + simpl. rewrite H by auto with *.
-        break_if; eauto using f_equal2 with *.
+      + subst. repeat find_rewrite. eauto with datatypes.
+      + simpl. rewrite H by auto with datatypes.
+        break_if; eauto using f_equal2 with datatypes.
   Qed.
 
   Lemma flat_map_nil : forall (f : A -> list B) l,
@@ -262,7 +262,7 @@ Section list_util.
     intros l l' Hnd Hp.
     induction Hp; auto; invc_NoDup; constructor;
       eauto using Permutation_in, Permutation_sym;
-      simpl in *; intuition.
+      simpl in *; intuition (auto with struct_util).
   Qed.
 
   Theorem NoDup_append :
@@ -319,7 +319,7 @@ Section list_util.
     induction xs; intros.
     - destruct ys; simpl in *; congruence.
     - invc_NoDup. concludes.
-      assert (In a ys) by eauto with *.
+      assert (In a ys) by eauto with datatypes.
       find_apply_lem_hyp in_split.
       break_exists_name l1.
       break_exists_name l2.
@@ -328,13 +328,13 @@ Section list_util.
       conclude_using ltac:(eauto using NoDup_remove_1).
       forward IHxs.
       intros x' Hx'.
-      assert (In x' (l1 ++ a :: l2)) by eauto with *.
-      do_in_app. simpl in *. intuition. subst. congruence.
+      assert (In x' (l1 ++ a :: l2)) by eauto with datatypes.
+      do_in_app. simpl in *. intuition auto with datatypes. subst. congruence.
       concludes.
       forward IHxs.
       rewrite app_length in *. simpl in *. lia.
       concludes.
-      do_in_app. simpl in *. intuition.
+      do_in_app. simpl in *. intuition auto with datatypes.
   Qed.
 
   Lemma remove_NoDup :
@@ -402,7 +402,8 @@ Section list_util.
        [congruence|intuition (auto with datatypes)].
       concludes.
       pose proof remove_length_lt a ys A_eq_dec.
-      conclude_using intuition.
+      assert (In a ys) by auto with datatypes.
+      concludes.
       simpl. lia.
   Qed.
 
@@ -432,7 +433,8 @@ Section list_util.
       In b (xs ++ ys) ->
       In b l.
   Proof using.
-    intros. subst. in_crush.
+    intros. subst.
+    do_in_app; intuition auto with datatypes.
   Qed.
   Hint Resolve app_cons_in_rest : struct_util.
 
@@ -479,10 +481,10 @@ Section list_util.
     induction l1; intros; simpl in *; break_if; simpl in *; invc_NoDup.
     - destruct l1'; simpl in *.
       + solve_by_inversion.
-      + find_inversion. exfalso. eauto using In_filter_In with *.
-    - exfalso. eauto using In_filter_In with *.
+      + find_inversion. exfalso. eauto using In_filter_In with datatypes.
+    - exfalso. eauto using In_filter_In with datatypes.
     - destruct l1'; simpl in *; break_and; find_inversion.
-      + exfalso. eauto with *.
+      + exfalso. eauto with datatypes.
       + find_apply_hyp_hyp. intuition auto using f_equal2.
     - eauto.
   Qed.
@@ -547,7 +549,7 @@ Section list_util.
     rewrite <- app_ass in *.
     find_apply_lem_hyp NoDup_remove_2.
     rewrite app_ass in *.
-    auto 10 with *.
+    auto 10 with datatypes.
   Qed.
 
   Lemma NoDup_app3_not_in_3 :
@@ -560,7 +562,7 @@ Section list_util.
     rewrite <- app_ass in *.
     find_apply_lem_hyp NoDup_remove_2.
     rewrite app_ass in *.
-    auto 10 with *.
+    auto 10 with datatypes.
   Qed.
 
   Lemma In_cons_2_3 :
@@ -569,7 +571,7 @@ Section list_util.
       In a (xs ++ x :: ys ++ y :: zs).
   Proof using.
     intros.
-    repeat (do_in_app; intuition auto 10 with *).
+    repeat (do_in_app; intuition auto 10 with datatypes).
   Qed.
 
   Lemma In_cons_2_3_neq :
@@ -580,7 +582,7 @@ Section list_util.
       In a (xs ++ ys ++ zs).
   Proof using.
     intros.
-    repeat (do_in_app; simpl in *; intuition (auto with *; try congruence)).
+    repeat (do_in_app; simpl in *; intuition (auto with datatypes; try congruence)).
   Qed.
 
   Lemma in_middle_reduce :
@@ -590,7 +592,7 @@ Section list_util.
       In a (xs ++ zs).
   Proof using.
     intros.
-    do_in_app; simpl in *; intuition. congruence.
+    do_in_app; simpl in *; intuition auto with datatypes. congruence.
   Qed.
 
   Lemma in_middle_insert :
@@ -599,7 +601,7 @@ Section list_util.
       In a (xs ++ y :: zs).
   Proof using.
     intros.
-    do_in_app; simpl in *; intuition.
+    do_in_app; simpl in *; intuition auto with datatypes.
   Qed.
 
   Lemma NoDup_rev :

@@ -25,7 +25,7 @@ Section dedup.
     intros. simpl in *.
     break_match.
     + auto.
-    + exfalso. intuition.
+    + exfalso. intuition auto with datatypes.
   Qed.
 
   Lemma dedup_In : forall (x : A) xs,
@@ -34,7 +34,7 @@ Section dedup.
   Proof using.
     induction xs; intros; simpl in *.
     - intuition.
-    - break_if; intuition; subst; simpl; auto.
+    - break_if; intuition auto; subst; simpl; auto.
   Qed.
 
   Lemma filter_dedup (pred : A -> bool) :
@@ -45,9 +45,14 @@ Section dedup.
     intros.
     induction xs; simpl; repeat (break_match; simpl);
       auto using f_equal2; try discriminate.
-      + exfalso. apply n. apply in_app_iff. apply in_app_or in i. intuition.
-      + exfalso. apply n. apply in_app_or in i. intuition.
-        * simpl in *. intuition. congruence.
+    - exfalso. apply n. apply in_app_iff.
+      apply in_app_or in i. intuition auto with datatypes.
+    - exfalso. apply n. apply in_app_or in i.
+      break_or_hyp.
+      + auto with datatypes.
+      + simpl in *; break_or_hyp.
+        * congruence. 
+        * auto with datatypes.
   Qed.
 
   Lemma dedup_app : forall (xs ys : list A),
@@ -57,14 +62,14 @@ Section dedup.
     intros. induction xs; simpl; auto.
     repeat break_match.
     - apply IHxs.
-      intros. apply H; intuition.
+      intros. apply H; intuition auto with datatypes.
     - exfalso. specialize (H a a).
-      apply H; intuition.
+      apply H; intuition auto with datatypes.
       do_in_app. intuition.
-    - exfalso. apply n. intuition.
+    - exfalso. apply n. intuition auto with datatypes.
     - simpl. f_equal.
       apply IHxs.
-      intros. apply H; intuition.
+      intros. apply H; intuition auto with datatypes.
   Qed.
 
   Lemma in_dedup_was_in :
