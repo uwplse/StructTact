@@ -69,8 +69,8 @@ Lemma fin_lt_Some_elim :
     @fin_lt (S n) (Some a) (Some b) -> fin_lt a b.
 Proof.
   intros.
-  unfold fin_lt. simpl.
-  intuition.
+  unfold fin_lt.
+  intuition auto with arith.
 Qed.
 
 Lemma fin_lt_Some_intro :
@@ -79,14 +79,14 @@ Lemma fin_lt_Some_intro :
 Proof.
   intros.
   unfold fin_lt. simpl.
-  intuition.
+  intuition auto with arith.
 Qed.
 
 Lemma None_lt_Some :
   forall n (x : fin n),
     @fin_lt (S n) None (Some x).
 Proof.
-  unfold fin_lt. simpl. auto with *.
+  unfold fin_lt. simpl. auto with arith.
 Qed.
 
 Lemma fin_lt_trans : 
@@ -151,14 +151,15 @@ Module fin_OT_compat (Import N : NatValue) <: UsualOrderedType.
   Definition eq_dec := fin_eq_dec n.
 End fin_OT_compat.
 
-From Coq Require Import Orders.
+From Coq Require Import Arith Orders.
 
 Lemma fin_lt_irrefl : 
   forall n, Irreflexive (@fin_lt n).
 Proof.
   intros.
   unfold Irreflexive, complement, Reflexive, fin_lt.
-  intuition.
+  intros x.
+  apply Nat.lt_irrefl.
 Qed.
 
 Lemma fin_lt_strorder :

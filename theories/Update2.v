@@ -246,7 +246,7 @@ Section Update2Rel.
     auto with datatypes.
     assert (H_not_in: ~ In n ns).
     intro.
-    intuition.
+    intuition auto with datatypes.
     simpl.
     break_if; auto.
     simpl.

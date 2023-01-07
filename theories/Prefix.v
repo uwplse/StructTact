@@ -70,8 +70,9 @@ Section prefix.
       In x l ->
       In x l'.
   Proof using.
-    induction l; intros; simpl in *; intuition;
-      subst; break_match; intuition; subst; intuition.
+    induction l; intros; simpl in *; intuition auto;
+      subst; break_match; intuition auto with datatypes;
+      subst; intuition auto with datatypes.
   Qed.
 
   Lemma Prefix_exists_rest :

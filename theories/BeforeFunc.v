@@ -19,7 +19,7 @@ Section before_func.
   Definition before_func_dec : forall l, {before_func f g l} + {~ before_func f g l}.
     intros; induction l; simpl in *.
     - intuition.
-    - destruct (f a); destruct (g a); intuition.
+    - destruct (f a); destruct (g a); intuition congruence.
   Defined.
 
   Lemma before_func_app :

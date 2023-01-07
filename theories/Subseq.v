@@ -40,8 +40,9 @@ Section subseq.
   Proof using.
     induction ys; intros.
     - destruct xs; simpl in *; intuition.
-    - simpl in *. break_match; simpl in *; intuition; subst; intuition eauto;
-                    right; (eapply IHys; [eauto| intuition]).
+    - simpl in *.
+      break_match; simpl in *; intuition auto; subst; intuition eauto;
+        right; (eapply IHys; [eauto| intuition auto with datatypes]).
   Qed.
 
   Theorem subseq_NoDup :
@@ -95,8 +96,10 @@ Section subseq.
       subseq xs ys ->
       length xs <= length ys.
   Proof using.
-    induction ys; intros; simpl in *; break_match; intuition.
-    subst. simpl in *. specialize (IHys l). concludes. auto with *.
+    induction ys; intros; simpl in *; break_match;
+      intuition auto with datatypes arith.
+    subst. simpl in *. specialize (IHys l).
+    concludes. auto with arith.
   Qed.
 
   Lemma subseq_subseq_eq :
