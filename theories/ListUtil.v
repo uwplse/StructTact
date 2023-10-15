@@ -533,9 +533,9 @@ Section list_util.
       False.
   Proof using.
     intros.
-    rewrite <- app_ass in *.
+    rewrite app_assoc in *.
     find_apply_lem_hyp NoDup_remove.
-    rewrite app_ass in *.
+    rewrite <- app_assoc in *.
     intuition (auto with datatypes).
   Qed.
 
@@ -546,9 +546,9 @@ Section list_util.
       False.
   Proof using.
     intros.
-    rewrite <- app_ass in *.
+    rewrite app_assoc in *.
     find_apply_lem_hyp NoDup_remove_2.
-    rewrite app_ass in *.
+    rewrite <- app_assoc in *.
     auto 10 with datatypes.
   Qed.
 
@@ -559,9 +559,9 @@ Section list_util.
       False.
   Proof using.
     intros.
-    rewrite <- app_ass in *.
+    rewrite app_assoc in *.
     find_apply_lem_hyp NoDup_remove_2.
-    rewrite app_ass in *.
+    rewrite <- app_assoc in *.
     auto 10 with datatypes.
   Qed.
 
