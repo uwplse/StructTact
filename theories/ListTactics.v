@@ -33,7 +33,7 @@ Ltac in_crush_finish :=
     | [ |- In _ (map _ _) ] => apply in_map_iff; eexists; eauto
   end.
 
-Ltac in_crush_start_tac tac :=
+Tactic Notation "in_crush_start_tac" tactic(tac) :=
   tac; simpl in *;
   repeat
     (match goal with
@@ -43,7 +43,7 @@ Ltac in_crush_start_tac tac :=
 
 Tactic Notation "in_crush_start" := in_crush_start_tac intuition.
 
-Ltac in_crush_tac tac := repeat (in_crush_start_tac tac; in_crush_finish).
+Tactic Notation "in_crush_tac" tactic(tac) := repeat (in_crush_start_tac tac; in_crush_finish).
 
 Tactic Notation "in_crush" := in_crush_tac intuition.
 
