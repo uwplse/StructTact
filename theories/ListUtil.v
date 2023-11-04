@@ -325,7 +325,7 @@ Section list_util.
       break_exists_name l2.
       subst.
       specialize (IHxs (l1 ++ l2)).
-      conclude_using ltac:(eauto using NoDup_remove_1).
+      conclude_using (eauto using NoDup_remove_1).
       forward IHxs.
       intros x' Hx'.
       assert (In x' (l1 ++ a :: l2)) by eauto with datatypes.

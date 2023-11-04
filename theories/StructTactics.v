@@ -147,19 +147,19 @@ Ltac break_and_goal :=
              | [ |- _ /\ _ ] => split
            end.
 
-(** [solve_by_inverison' tac] succeeds if it can solve your goal by
+(** [solve_by_inversion' tac] succeeds if it can solve your goal by
     inverting a hypothesis and then running [tac]. *)
-Ltac solve_by_inversion' tac :=
+Tactic Notation "solve_by_inversion'" tactic(tac) :=
   match goal with
     | [H : _ |- _] => solve [inv H; tac]
   end.
 
-(** [solve_by_inverison] succeeds if it can solve your goal by
+(** [solve_by_inversion] succeeds if it can solve your goal by
     inverting a hypothesis and then running [auto]. *)
-Ltac solve_by_inversion := solve_by_inversion' auto.
+Tactic Notation "solve_by_inversion" := solve_by_inversion' auto.
 
 (** TODO: document this. *)
-Ltac apply_fun f H:=
+Ltac apply_fun f H :=
   match type of H with
     | ?X = ?Y => assert (f X = f Y)
   end.
@@ -167,7 +167,7 @@ Ltac apply_fun f H:=
 (** [conclude H tac] assumes [H] is of the form [A -> B] and
     specializes it into [B] if it successfully proves [A] using
     [tac]. *)
-Ltac conclude H tac :=
+Tactic Notation "conclude" hyp(H) tactic3(tac) :=
   (let H' := fresh in
    match type of H with
      | ?P -> _ => assert P as H' by (tac)
@@ -335,7 +335,7 @@ Ltac copy_eapply lem H :=
 
 (** [conclude_using tac] specializes a hypothesis if it can prove its
     premise using [tac]. *)
-Ltac conclude_using tac :=
+Tactic Notation "conclude_using" tactic3(tac) :=
   match goal with
     | [ H : ?P -> _ |- _ ] => conclude H tac
   end.
