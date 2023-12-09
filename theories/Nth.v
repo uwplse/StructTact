@@ -2,6 +2,8 @@ From Coq Require Import List.
 From StructTact Require Import StructTactics.
 Import ListNotations.
 
+Set Default Proof Using "Type".
+
 Set Implicit Arguments.
 
 Inductive Nth {A : Type} : list A -> nat -> A -> Prop :=
@@ -15,7 +17,7 @@ Section nth.
     forall n l (x : A),
       nth_error l n = Some x ->
       Nth l n x.
-  Proof using.
+  Proof.
     induction n; intros; simpl in *; auto.
     - break_match; try discriminate.
       unfold value in *.
@@ -30,7 +32,7 @@ Section nth.
     forall n l (x : A),
       Nth l n x ->
       nth_error l n = Some x.
-  Proof using.
+  Proof.
     intros.
     induction H; simpl in *; auto.
   Qed.

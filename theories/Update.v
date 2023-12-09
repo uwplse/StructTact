@@ -1,6 +1,8 @@
 From StructTact Require Import StructTactics.
 From Coq Require Import FunctionalExtensionality.
 
+Set Default Proof Using "Type".
+
 Definition update {A B : Type} (A_eq_dec : forall x y : A, {x = y} + {x <> y}) st h (v : B) := 
   fun nm => if A_eq_dec nm h then v else st nm.
 
@@ -12,7 +14,7 @@ Section update.
     forall (sigma : A -> B) x v y,
       x <> y ->
       update A_eq_dec sigma x v y = sigma y.
-  Proof using.
+  Proof.
     unfold update.
     intros.
     break_if; congruence.
@@ -21,7 +23,7 @@ Section update.
   Lemma update_nop :
     forall (sigma : A -> B) x y,
       update A_eq_dec sigma x (sigma x) y = sigma y.
-  Proof using.
+  Proof.
     unfold update.
     intros. break_if; congruence.
   Qed.
@@ -30,7 +32,7 @@ Section update.
     forall (sigma : A -> B) x y v,
       x = y ->
       update A_eq_dec sigma x v y = v.
-  Proof using.
+  Proof.
     intros. subst.
     unfold update.
     break_if; congruence.
@@ -39,7 +41,7 @@ Section update.
   Lemma update_same :
     forall (sigma : A -> B) x v,
       update A_eq_dec sigma x v x = v.
-  Proof using.
+  Proof.
     intros.
     rewrite update_eq; auto.
   Qed.
@@ -47,7 +49,7 @@ Section update.
   Lemma update_nop_ext :
     forall (sigma : A -> B) h,
       update A_eq_dec sigma h (sigma h) = sigma.
-  Proof using.
+  Proof.
     intros.
     apply functional_extensionality.
     intros.
@@ -58,7 +60,7 @@ Section update.
     forall (sigma : A -> B) y v,
       sigma y = v ->
       update A_eq_dec sigma y v = sigma.
-  Proof using.
+  Proof.
     intros.
     subst.
     apply update_nop_ext.
@@ -67,7 +69,7 @@ Section update.
   Lemma update_overwrite :
     forall (sigma : A -> B) h st st',
       update A_eq_dec (update A_eq_dec sigma h st) h st' = update A_eq_dec sigma h st'.
-  Proof using.
+  Proof.
     intros.
     apply functional_extensionality.
     intros. destruct (A_eq_dec h x).

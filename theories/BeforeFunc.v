@@ -2,6 +2,8 @@ From Coq Require Import List.
 From StructTact Require Import StructTactics Before Prefix.
 Import ListNotations.
 
+Set Default Proof Using "Type".
+
 Set Implicit Arguments.
 
 Fixpoint before_func {A: Type} (f : A -> bool) (g : A -> bool) (l : list A) : Prop :=
@@ -26,7 +28,7 @@ Section before_func.
     forall l x,
       before_func f g l ->
       before_func f g (l ++ x).
-  Proof using.
+  Proof.
     intros. induction l; simpl in *; intuition.
   Qed.
 
@@ -35,7 +37,7 @@ Section before_func.
       before_func f g l ->
       before_func g f l ->
       False.
-  Proof using. 
+  Proof. 
     induction l; simpl; intuition.
     - eauto.
     - congruence.
@@ -47,7 +49,7 @@ Section before_func.
       before_func f g l ->
       (forall x, In x l' -> g x = false) ->
       before_func f g (l' ++ l).
-  Proof using. 
+  Proof. 
     induction l'; intros; simpl in *; intuition.
   Qed.
 
@@ -59,7 +61,7 @@ Section before_func.
         exists x : A,
           f x = true /\
           before x y l.
-  Proof using. 
+  Proof. 
     induction l; intros; simpl in *; intuition.
     - eauto.
     - find_copy_apply_hyp_hyp. break_exists_exists. intuition.
@@ -71,7 +73,7 @@ Section before_func.
       Prefix l l' ->
       before_func f g l ->
       before_func f g l'.
-  Proof using. 
+  Proof. 
     intros.
     find_apply_lem_hyp Prefix_exists_rest.
     break_exists; subst.
@@ -84,7 +86,7 @@ Section before_func.
       before_func f g (l ++ l') ->
       (forall x, In x l -> g x = false) /\
       before_func f g l'.
-  Proof using.
+  Proof.
     intros. induction l; simpl in *; intuition; subst; auto.
   Qed.
 End before_func.
