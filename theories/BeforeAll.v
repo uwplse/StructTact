@@ -2,6 +2,8 @@ From Coq Require Import List.
 From StructTact Require Import StructTactics ListTactics.
 Import ListNotations.
 
+Set Default Proof Using "Type".
+
 Fixpoint before_all {A : Type} (x : A) y l : Prop :=
   match l with
     | [] => True
@@ -18,7 +20,7 @@ Section before_all.
       x <> y ->
       before_all x y (y :: l) ->
       ~ In x l.
-  Proof using.
+  Proof.
     intros.
     simpl in *.
     break_or_hyp; auto.
@@ -30,7 +32,7 @@ Section before_all.
     a <> x ->
     before_all x y l ->
     before_all x y (l ++ [a]).
-  Proof using.
+  Proof.
   induction l.
   - intros; left; auto.
   - intros;
@@ -51,7 +53,7 @@ Section before_all.
     forall l (x y : A),
       ~ In x l ->
       before_all x y l.
-  Proof using.
+  Proof.
     intros.
     destruct l; simpl in *; auto.
   Qed.
@@ -60,7 +62,7 @@ Section before_all.
     forall l (x y : A),
       ~ In y l ->
       before_all x y l.
-  Proof using.
+  Proof.
     induction l.
     - intros. simpl in *. auto.
     - intros. simpl in *.

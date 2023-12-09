@@ -3,6 +3,8 @@ From StructTact Require Import StructTactics ListUtil.
 From StructTact Require Import ListTactics Before.
 Import ListNotations.
 
+Set Default Proof Using "Type".
+
 Set Implicit Arguments.
 
 Section remove_all.
@@ -19,7 +21,7 @@ Section remove_all.
     forall ds l x,
       In x (remove_all ds l) ->
       In x l.
-  Proof using.
+  Proof.
     induction ds; intros; simpl in *; intuition.
     eauto using in_remove.
   Qed.
@@ -29,7 +31,7 @@ Section remove_all.
       ~ In x ds ->
       In x l ->
       In x (remove_all ds l).
-  Proof using.
+  Proof.
     induction ds; intros; simpl in *; intuition auto using remove_preserve.
   Qed.
 
@@ -38,7 +40,7 @@ Section remove_all.
       In x (remove_all ds l) ->
       In x ds ->
       False.
-  Proof using.
+  Proof.
     induction ds; intros; simpl in *; intuition.
     - subst. find_apply_lem_hyp in_remove_all_was_in.
       eapply remove_In; eauto.
@@ -48,7 +50,7 @@ Section remove_all.
   Lemma remove_all_nil :
     forall ys,
       remove_all ys [] = [].
-  Proof using.
+  Proof.
     intros. induction ys; simpl in *; intuition.
   Qed.
 
@@ -58,7 +60,7 @@ Section remove_all.
        In a ys) \/
       (remove_all ys (a :: l) = a :: (remove_all ys l) /\
        ~In a ys).
-  Proof using.
+  Proof.
     induction ys; intros; simpl in *; intuition.
     break_if; subst; simpl in *; intuition.
     specialize (IHys a0 (remove A_eq_dec a l)). intuition.
@@ -69,7 +71,7 @@ Section remove_all.
       before x y (remove_all ys l) ->
       ~ In y ys ->
       before x y l.
-  Proof using.
+  Proof.
     induction l; intros; simpl in *; intuition.
     - rewrite remove_all_nil in *. simpl in *. intuition.
     - pose proof remove_all_cons ys a l. intuition.
@@ -83,7 +85,7 @@ Section remove_all.
       before x y l ->
       ~ In x xs ->
       before x y (remove_all xs l).
-  Proof using.
+  Proof.
     induction l; intros; simpl in *; intuition;
       pose proof remove_all_cons xs a l; subst; intuition;
         repeat find_rewrite; simpl in *; intuition.
@@ -93,7 +95,7 @@ Section remove_all.
     forall l l',
     NoDup l' ->
     NoDup (remove_all l l').
-  Proof using.
+  Proof.
     intros.
     induction l'.
     - rewrite remove_all_nil; auto.
@@ -111,7 +113,7 @@ Section remove_all.
      NoDup l' ->
      remove_all l l' = l0 ++ a :: l1 ->
      remove_all l (remove A_eq_dec a l') = l0 ++ l1.
-  Proof using.
+  Proof.
     induction l'; intros; simpl in *.
     - find_rewrite_lem remove_all_nil.
       destruct l0; simpl in *; match goal with H: [] = _ |- _ => contradict H end; auto using nil_cons.
@@ -145,7 +147,7 @@ Section remove_all.
   Lemma remove_all_app_l :
     forall xs ys zs,
       remove_all (xs ++ ys) zs = remove_all xs (remove_all ys zs).
-  Proof using.
+  Proof.
     induction zs; intros.
     - now repeat rewrite remove_all_nil.
     - pose proof (remove_all_cons (xs ++ ys) a zs).
@@ -160,7 +162,7 @@ Section remove_all.
   Lemma remove_all_app_r :
     forall xs ys zs,
       remove_all xs (ys ++ zs) = remove_all xs ys ++ remove_all xs zs.
-  Proof using.
+  Proof.
     induction xs.
     - auto.
     - intros.
@@ -172,7 +174,7 @@ Section remove_all.
   Lemma remove_all_del_comm :
     forall xs ys zs,
       remove_all xs (remove_all ys zs) = remove_all ys (remove_all xs zs).
-  Proof using.
+  Proof.
     intros.
     induction zs; intros.
     - now repeat rewrite remove_all_nil.

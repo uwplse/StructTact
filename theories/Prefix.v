@@ -2,6 +2,8 @@ From Coq Require Import List.
 From StructTact Require Import StructTactics.
 Import ListNotations.
 
+Set Default Proof Using "Type".
+
 Set Implicit Arguments.
 
 Fixpoint Prefix {A} (l1 : list A) l2 : Prop :=
@@ -17,7 +19,7 @@ Section prefix.
   Lemma Prefix_refl :
     forall (l : list A),
       Prefix l l.
-  Proof using.
+  Proof.
     intros. induction l; simpl in *; auto.
   Qed.
 
@@ -25,7 +27,7 @@ Section prefix.
     forall (l : list A),
       Prefix l [] ->
       l = [].
-  Proof using.
+  Proof.
     intros. destruct l.
     - reflexivity.
     - contradiction.
@@ -35,7 +37,7 @@ Section prefix.
     forall (l l' : list A) a,
       Prefix l' l ->
       Prefix (a :: l') (a :: l).
-  Proof using.
+  Proof.
     simpl. intuition.
   Qed.
 
@@ -43,7 +45,7 @@ Section prefix.
     forall (l l' : list A),
       Prefix l' l ->
       forall x, In x l' -> In x l.
-  Proof using.
+  Proof.
     induction l; intros l' H.
     - find_apply_lem_hyp Prefix_nil. subst. contradiction.
     - destruct l'.
@@ -56,7 +58,7 @@ Section prefix.
     forall (xs ys zs : list A),
       xs ++ ys = zs ->
       Prefix xs zs.
-  Proof using.
+  Proof.
     induction xs; intros; simpl in *.
     - auto.
     - break_match.
@@ -69,7 +71,7 @@ Section prefix.
       Prefix l l' ->
       In x l ->
       In x l'.
-  Proof using.
+  Proof.
     induction l; intros; simpl in *; intuition auto;
       subst; break_match; intuition auto with datatypes;
       subst; intuition auto with datatypes.
@@ -80,7 +82,7 @@ Section prefix.
       Prefix l1 l2 ->
       exists rest,
         l2 = l1 ++ rest.
-  Proof using.
+  Proof.
     induction l1; intros; simpl in *; eauto.
     break_match; intuition. subst.
     find_apply_hyp_hyp.

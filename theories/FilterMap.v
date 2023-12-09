@@ -2,6 +2,8 @@ From Coq Require Import List.
 From StructTact Require Import StructTactics ListTactics.
 Import ListNotations.
 
+Set Default Proof Using "Type".
+
 Set Implicit Arguments.
 
 Fixpoint filterMap {A B} (f : A -> option B) (l : list A) : list B :=
@@ -22,7 +24,7 @@ Section filter_map.
                                                  | Some y => Some (g y)
                                                  | None => None
                                                  end) l.
-  Proof using.
+  Proof.
     induction l; intros; simpl in *.
     - auto.
     - repeat break_match; simpl; auto using f_equal.
@@ -32,7 +34,7 @@ Section filter_map.
     forall (f g : A -> option B) l,
       (forall x, f x = g x) ->
       filterMap f l = filterMap g l.
-  Proof using.
+  Proof.
     induction l; intros; simpl in *.
     - auto.
     - repeat find_higher_order_rewrite; auto.
@@ -44,7 +46,7 @@ Section filter_map.
                              | Some y => y :: filterMap f xs
                              | None => filterMap f xs
                              end.
-  Proof using.
+  Proof.
     simpl. auto.
   Qed.
 
@@ -53,7 +55,7 @@ Section filter_map.
       In b (filterMap f xs) ->
       exists a,
         In a xs /\ f a = Some b.
-  Proof using.
+  Proof.
     intros.
     induction xs; simpl in *; intuition.
     break_match.
@@ -65,7 +67,7 @@ Section filter_map.
   Lemma filterMap_app :
     forall (f : A -> option B) xs ys,
       filterMap f (xs ++ ys) = filterMap f xs ++ filterMap f ys.
-  Proof using.
+  Proof.
     induction xs; intros; simpl in *; repeat break_match; simpl in *; intuition auto using f_equal.
   Qed.
 
@@ -74,7 +76,7 @@ Section filter_map.
       f a = Some b ->
       In a xs ->
       In b (filterMap f xs).
-  Proof using.
+  Proof.
     induction xs; simpl; repeat break_match; simpl; intuition (auto; try congruence).
   Qed.
 
@@ -85,7 +87,7 @@ Section filter_map.
                          | Some b => f b
                          | None => None
                          end) xs.
-  Proof using.
+  Proof.
     induction xs; simpl; intuition.
     repeat break_match; simpl; repeat find_rewrite; auto.
   Qed.
@@ -94,7 +96,7 @@ Section filter_map.
     forall (f : A -> option B) xs,
       (forall x, In x xs -> f x = None) ->
       filterMap f xs = [].
-  Proof using.
+  Proof.
     induction xs; intros; simpl in *; intuition.
     rewrite H; auto.
   Qed.
@@ -107,7 +109,7 @@ Section filter_map.
           x1 = x2) ->
       NoDup l ->
       NoDup (filterMap f l).
-  Proof using.
+  Proof.
     induction l; intros.
     - constructor.
     - simpl. invc_NoDup.

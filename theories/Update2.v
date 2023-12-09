@@ -7,6 +7,8 @@ From Coq Require Import Sumbool Sorting.Permutation.
 From Coq Require Import Relation_Definitions RelationClasses.
 Import ListNotations.
 
+Set Default Proof Using "Type".
+
 Definition update2 {A B : Type} (A_eq_dec : forall x y : A, {x = y} + {x <> y}) (f : A -> A -> B) (x y : A) (v : B) :=
   fun x' y' => if sumbool_and _ _ _ _ (A_eq_dec x x') (A_eq_dec y y') then v else f x' y'.
 
@@ -41,7 +43,7 @@ Section Update2.
     forall (sigma : A -> A -> B) x y v x' y',
       x <> x' ->
       update2 A_eq_dec sigma x y v x' y' = sigma x' y'.
-  Proof using.
+  Proof.
     unfold update2.
     intros.
     break_if; intuition congruence.
@@ -51,7 +53,7 @@ Section Update2.
     forall (sigma : A -> A -> B) x y v x' y',
       y <> y' ->
       update2 A_eq_dec sigma x y v x' y' = sigma x' y'.
-  Proof using.
+  Proof.
     unfold update2.
     intros.
     break_if; intuition congruence.
@@ -61,7 +63,7 @@ Section Update2.
     forall (sigma : A -> A -> B) x y v x' y',
       (x, y) <> (x', y') ->
       update2 A_eq_dec sigma x y v x' y' = sigma x' y'.
-  Proof using.
+  Proof.
     unfold update2.
     intros.
     break_if; intuition congruence.
@@ -70,7 +72,7 @@ Section Update2.
   Lemma update2_nop :
     forall (sigma : A -> A -> B) x y x' y',
       update2 A_eq_dec sigma x y (sigma x y) x' y' = sigma x' y'.
-  Proof using.
+  Proof.
     unfold update2.
     intros. break_if; intuition congruence.
   Qed.
@@ -80,7 +82,7 @@ Section Update2.
       x = x' ->
       y = y' ->
       update2 A_eq_dec sigma x y v x' y' = v.
-  Proof using.
+  Proof.
     intros. subst.
     unfold update2.
     break_if; intuition congruence.
@@ -90,7 +92,7 @@ Section Update2.
     forall (sigma : A -> A -> B) x y x' y' v,
       (x, y) = (x', y') ->
       update2 A_eq_dec sigma x y v x' y' = v.
-  Proof using.
+  Proof.
     intros. subst.
     unfold update2.
     break_if; intuition congruence.
@@ -99,7 +101,7 @@ Section Update2.
   Lemma update2_same :
     forall (sigma : A -> A -> B) x y v,
       update2 A_eq_dec sigma x y v x y = v.
-  Proof using.
+  Proof.
     intros.
     rewrite update2_eq; auto.
   Qed.
@@ -107,7 +109,7 @@ Section Update2.
   Lemma update2_nop_ext :
     forall (sigma : A -> A -> B) x y,
       update2 A_eq_dec sigma x y (sigma x y) = sigma.
-  Proof using.
+  Proof.
     intros.
     do 2 (apply functional_extensionality; intros).
     apply update2_nop.
@@ -117,7 +119,7 @@ Section Update2.
     forall (sigma : A -> A -> B) x y v,
       sigma x y = v ->
       update2 A_eq_dec sigma x y v = sigma.
-  Proof using.
+  Proof.
     intros.
     subst.
     apply update2_nop_ext.
@@ -126,7 +128,7 @@ Section Update2.
   Lemma update2_overwrite :
     forall (sigma : A -> A -> B) x y st st',
       update2 A_eq_dec (update2 A_eq_dec sigma x y st) x y st' = update2 A_eq_dec sigma x y st'.
-  Proof using.
+  Proof.
     intros.
     do 2 (apply functional_extensionality; intros).
     destruct (A_eq_dec x x0);
@@ -143,7 +145,7 @@ End Update2.
 Lemma update2_fun_comm :
   forall A B C A_eq_dec (f : B -> C) (st : A -> A -> B) x y v x' y',
     f (update2 A_eq_dec st x y v x' y') = update2 A_eq_dec (fun x y => f (st x y)) x y (f v) x' y'.
-Proof using.
+Proof.
   intros.
   destruct (prod_eq_dec A_eq_dec A_eq_dec (x, y) (x', y')); subst;
     repeat first [rewrite update2_diff_prod by congruence |
@@ -202,7 +204,7 @@ Section Update2Rel.
     forall n n' ns,
       In n' (filter_rel R_dec n ns) ->
       In n' ns /\ R n n'.
-  Proof using.
+  Proof.
     intros.
     induction ns; simpl in *; [ intuition | idtac ].
     break_if; simpl in *.
@@ -220,7 +222,7 @@ Section Update2Rel.
       In n' ns -> 
       R n n' ->
       In n' (filter_rel R_dec n ns).
-  Proof using.
+  Proof.
     intros.
     induction ns; simpl in *; [ intuition | idtac ].
     break_if.
@@ -238,7 +240,7 @@ Section Update2Rel.
     forall ns n h,
       ~ In n ns ->
       ~ In n (filter_rel R_dec h ns).
-  Proof using.
+  Proof.
     induction ns; intros; auto.
     assert (H_neq: a <> n).
     intro.
@@ -259,7 +261,7 @@ Section Update2Rel.
     forall h ns,
       NoDup ns ->
       NoDup (filter_rel R_dec h ns).
-  Proof using.
+  Proof.
     intros.
     induction ns; auto.
     invc_NoDup.
@@ -274,7 +276,7 @@ Section Update2Rel.
   Lemma filter_rel_self_eq {irreflexive_R : Irreflexive R} :
     forall ns0 ns1 h,
       filter_rel R_dec h (ns0 ++ h :: ns1) = filter_rel R_dec h (ns0 ++ ns1).
-  Proof using.
+  Proof.
     induction ns0; intros; simpl in *.
     - break_if; auto.
       find_apply_lem_hyp irreflexive_R.
@@ -288,7 +290,7 @@ Section Update2Rel.
     forall (f : A -> A -> list B) g h n n' l,
       f n n' = g n n' ->
       collate A_eq_dec h f l n n' = collate A_eq_dec h g l n n'.
-  Proof using.
+  Proof.
     intros f g h n n' l.
     generalize f g; clear f g.
     induction l; auto.
@@ -312,7 +314,7 @@ Section Update2Rel.
     forall l h n n' (f : A -> A -> list B) a,
       In a (f n' n) ->
       In a ((collate A_eq_dec h f l) n' n).
-  Proof using.
+  Proof.
     induction l; intros; auto.
     destruct a.
     apply IHl.
@@ -329,7 +331,7 @@ Section Update2Rel.
     forall l h n n' (f : A -> A -> list B) a,
       head (f n' n) = Some a ->
       head ((collate A_eq_dec h f l) n' n) = Some a.
-  Proof using.
+  Proof.
     induction l; intros; auto.
     destruct a.
     simpl.
@@ -346,7 +348,7 @@ Section Update2Rel.
     forall h n n' ns (f : A -> A -> list B),
       h <> n ->
       collate A_eq_dec h f ns n n' = f n n'.
-  Proof using.
+  Proof.
     intros.
     revert f.
     induction ns; intros; auto.
@@ -363,7 +365,7 @@ Section Update2Rel.
     forall h' h (f : A -> A -> list B) l,
       ~ In h (map fst l) ->
       collate A_eq_dec h' f l h' h = f h' h.
-  Proof using.
+  Proof.
     intros.
     revert f.
     induction l; intros; auto.
@@ -389,7 +391,7 @@ Section Update2Rel.
   Lemma collate_app :
     forall h' l1 l2 (f : A -> A -> list B),
       collate A_eq_dec h' f (l1 ++ l2) = collate A_eq_dec h' (collate A_eq_dec h' f l1) l2.
-  Proof using.
+  Proof.
     induction l1; intros; auto.
     simpl.
     break_let.
@@ -403,7 +405,7 @@ Section Update2Rel.
     forall h h' n (f : A -> A -> list B) l ms,
       n <> h' ->
       collate A_eq_dec h (update2 A_eq_dec f h n ms) l h h' = collate A_eq_dec h f l h h'.
-  Proof using.
+  Proof.
     intros.
     assert (H_eq: update2 A_eq_dec f h n ms h h' =  f h h').
     unfold update2.
@@ -418,7 +420,7 @@ Section Update2Rel.
     forall h h' l1 l2 (f : A -> A -> list B),
       ~ In h' (map fst l1) ->
       collate A_eq_dec h f (l1 ++ l2) h h' = collate A_eq_dec h f l2 h h'.
-  Proof using.
+  Proof.
     intros.
     rewrite collate_app.
     revert f.
@@ -444,7 +446,7 @@ Section Update2Rel.
     forall h h' l1 l2 (f : A -> A -> list B),
       ~ In h' (map fst l2) ->
       collate A_eq_dec h f (l1 ++ l2) h h' = collate A_eq_dec h f l1 h h'.
-  Proof using.
+  Proof.
     intros.
     rewrite collate_app.
     revert f.
@@ -460,7 +462,7 @@ Section Update2Rel.
     forall h h' l1 l2 (f : A -> A -> list B) m,
       ~ In h (map fst (l1 ++ l2)) ->
       collate A_eq_dec h' (update2 A_eq_dec f h' h (f h' h ++ [m])) (l1 ++ l2) = collate A_eq_dec h' f (l1 ++ (h, m) :: l2).
-  Proof using.
+  Proof.
     intros h h' l1 l2 f m H_in.
     apply functional_extensionality; intro from.
     apply functional_extensionality; intro to.
@@ -501,7 +503,7 @@ Section Update2Rel.
       NoDup (map fst l) ->
       Permutation l l' ->
       collate A_eq_dec h f l = collate A_eq_dec h f l'.
-  Proof using.
+  Proof.
     intros h f l.
     revert h f.
     induction l.
@@ -538,7 +540,7 @@ Section Update2Rel.
     forall m n h ns (f : A -> A -> list B),
       ~ R h n ->
       collate A_eq_dec h f (map2snd m (filter_rel R_dec h ns)) h n = f h n.
-  Proof using.
+  Proof.
     intros m n h ns f H_adj.
     revert f.
     induction ns; intros; auto.
@@ -556,7 +558,7 @@ Section Update2Rel.
       In x (collate A_eq_dec from f (map2snd m dsts) a b) ->
       x <> m ->
       In x (f a b).
-  Proof using.
+  Proof.
     intros.
     generalize dependent f.
     induction dsts.
@@ -578,7 +580,7 @@ Section Update2Rel.
     forall m n h ns (f : A -> A -> list B),
       ~ In n ns ->
       collate A_eq_dec h f (map2snd m (filter_rel R_dec h ns)) h n = f h n.
-  Proof using.
+  Proof.
     intros m n h ns f.
     revert f.
     induction ns; intros; auto.
@@ -602,7 +604,7 @@ Section Update2Rel.
     forall m n h ns (f : A -> A -> list B) ns',
       ~ In n ns ->
       collate A_eq_dec h f (map2snd m (filter_rel R_dec h (remove_all A_eq_dec ns' ns))) h n = f h n.
-  Proof using.
+  Proof.
     intros m n h ns f ns' H_in.
     apply collate_map2snd_not_in.
     intro.
@@ -617,7 +619,7 @@ Section Update2Rel.
       In n ns ->
       NoDup ns ->
       collate A_eq_dec h f (map2snd m (filter_rel R_dec h (remove_all A_eq_dec ns' ns))) h n = f h n ++ [m].
-  Proof using.
+  Proof.
     intros m n h ns f ns' H_in H_adj.
     revert f.
     induction ns; intros; [ contradict H | idtac ].
@@ -658,7 +660,7 @@ Section Update2Rel.
     forall m n h ns (f : A -> A -> list B) ns',
       In n ns' ->
       collate A_eq_dec h f (map2snd m (filter_rel R_dec h (remove_all A_eq_dec ns' ns))) h n = f h n.
-  Proof using.
+  Proof.
     intros m n h ns f ns'.
     revert f.
     induction ns; intros.
@@ -683,7 +685,7 @@ Section Update2Rel.
       R h n ->
       ~ In n ns ->
       collate A_eq_dec h f (map2snd a (filter_rel R_dec h (n :: ns))) h n = f h n ++ [a].
-  Proof using.
+  Proof.
     intros a n h ns f H_adj H_in.
     simpl.
     break_if; intuition.
@@ -723,7 +725,7 @@ Section Update2Rel.
       ~ In n ns ->
       In a (collate A_eq_dec h f (map2snd a (filter_rel R_dec h ns)) h n) ->
       In a (f h n).
-  Proof using.
+  Proof.
     induction ns; intros; auto.
     assert (H_in': ~ In n ns).
     intro.
@@ -752,7 +754,7 @@ Section Update2Rel.
     forall n h (m : B) ns,
       ~ In n ns ->
       ~ In (n, m) (map2snd m (filter_rel R_dec h ns)).
-  Proof using.
+  Proof.
     intros.
     induction ns; intros; auto.
     simpl in *.
@@ -781,7 +783,7 @@ Section Update2Rel.
     forall h (m : B) ns,
       NoDup ns ->
       NoDup (map2snd m (filter_rel R_dec h ns)).
-  Proof using.
+  Proof.
     intros.
     induction ns.
     - apply NoDup_nil.
@@ -799,7 +801,7 @@ Section Update2Rel.
     forall h (m : B) ns nm,
       In nm (map2snd m (filter_rel R_dec h ns)) ->
       snd nm = m.
-  Proof using.
+  Proof.
     intros.
     induction ns; intros; simpl in *; intuition.
     break_if.
@@ -813,7 +815,7 @@ Section Update2Rel.
     forall (m : B) ns n h,
       In (n, m) (map2snd m (filter_rel R_dec h ns)) ->
       R h n /\ In n ns.
-  Proof using.
+  Proof.
     intros m.
     induction ns; intros; simpl in *; [ intuition | idtac ].
     break_if; simpl in *.
@@ -831,7 +833,7 @@ Section Update2Rel.
     forall ns (f : A -> A -> list B) h mg from to,
       ~ In from ns ->
       collate_ls A_eq_dec ns f h mg from to = f from to.
-  Proof using.
+  Proof.
     induction ns; intros; auto.
     assert (H_neq: a <> from).
     intro.
@@ -856,7 +858,7 @@ Section Update2Rel.
     forall ns (f : A -> A -> list B) to m x a b,
       In x (f a b) ->
       In x (collate_ls A_eq_dec ns f to m a b).
-  Proof using.
+  Proof.
     intros.
     generalize dependent f.
     induction ns.
@@ -875,7 +877,7 @@ Section Update2Rel.
     forall ns (f : A -> A -> list B) h mg from to,
       h <> to ->
       collate_ls A_eq_dec ns f h mg from to = f from to.
-  Proof using.
+  Proof.
     induction ns; intros; auto.
     simpl in *.
     rewrite IHns; auto.
@@ -890,7 +892,7 @@ Section Update2Rel.
       NoDup ns ->
       In from ns ->
       collate_ls A_eq_dec ns f h mg from h = f from h ++ [mg].
-  Proof using.
+  Proof.
     induction ns; intros; simpl in *; [ intuition | idtac ].
     invc_NoDup.
     break_or_hyp.
@@ -916,7 +918,7 @@ Section Update2Rel.
       In from ns ->
       NoDup ns ->
       collate_ls A_eq_dec (filter_rel R_dec h (remove_all A_eq_dec ns' ns)) f h mg from h = f from h ++ [mg].
-  Proof using.
+  Proof.
     intros.
     rewrite collate_ls_NoDup_in; auto.
     - apply NoDup_filter_rel.
@@ -931,7 +933,7 @@ Section Update2Rel.
     forall ns (f : A -> A -> list B) g h mg n n',
       f n n' = g n n' ->
       collate_ls A_eq_dec ns f h mg n n' = collate_ls A_eq_dec ns g h mg n n'.
-  Proof using.
+  Proof.
     induction ns; intros; simpl in *; auto.
     set (f' := update2 _ _ _ _ _).
     set (g' := update2 _ _ _ _ _).
@@ -948,7 +950,7 @@ Section Update2Rel.
     forall ns (f : A -> A -> list B) n h h' ms mg,
       n <> h' ->
       collate_ls A_eq_dec ns (update2 A_eq_dec f n h ms) h mg h' h = collate_ls A_eq_dec ns f h mg h' h.
-  Proof using.
+  Proof.
     intros.
     assert (H_eq: update2 A_eq_dec f n h ms h' h = f h' h).
     unfold update2.
@@ -966,7 +968,7 @@ Section Update2Rel.
       exists l,
         (forall x, In x l -> x = m) /\
         collate_ls A_eq_dec s f to m a b = f a b ++ l.
-  Proof using.
+  Proof.
     intros.
     generalize dependent f.
     induction s as [|n s].
@@ -1001,7 +1003,7 @@ Section Update2Rel.
       In x (collate_ls A_eq_dec s f to m a b) ->
       x <> m ->
       In x (f a b).
-  Proof using.
+  Proof.
     intros.
     pose proof (collate_ls_cases s f to m a b); break_or_hyp.
     - now find_rewrite.
@@ -1015,7 +1017,7 @@ Section Update2Rel.
     forall ns (f : A -> A -> list B) n h mg,
       ~ R h n ->
       collate_ls A_eq_dec (filter_rel R_dec h ns) f h mg n h = f n h.
-  Proof using.
+  Proof.
     induction ns; intros; simpl in *; auto.
     case (A_eq_dec n a); intro.
     - subst.
@@ -1035,7 +1037,7 @@ Section Update2Rel.
     forall ns (f : A -> A -> list B) n h mg,
       ~ In n ns ->
       collate_ls A_eq_dec (filter_rel R_dec h ns) f h mg n h = f n h.
-  Proof using.
+  Proof.
     intros.
     rewrite collate_ls_not_in; auto.
     apply not_in_not_in_filter_rel.
@@ -1046,7 +1048,7 @@ Section Update2Rel.
     forall ns (f : A -> A -> list B) n h mg ns',
       ~ In n ns ->
       collate_ls A_eq_dec (filter_rel R_dec h (remove_all A_eq_dec ns' ns)) f h mg n h = f n h.
-  Proof using.
+  Proof.
     intros.
     rewrite collate_ls_not_in; auto.
     apply not_in_not_in_filter_rel.
@@ -1059,7 +1061,7 @@ Section Update2Rel.
     forall mg n h ns (f : A -> A -> list B) ns',
       In n ns' ->
       collate_ls A_eq_dec (filter_rel R_dec h (remove_all A_eq_dec ns' ns)) f h mg n h = f n h.
-  Proof using.
+  Proof.
     intros.
     revert f.
     induction ns; intros.
@@ -1086,7 +1088,7 @@ Section Update2Rel.
   Lemma collate_ls_app :
     forall l1 l2 (f : A -> A -> list B) h m,
       collate_ls A_eq_dec (l1 ++ l2) f h m = collate_ls A_eq_dec l2 (collate_ls A_eq_dec l1 f h m) h m.
-  Proof using. 
+  Proof. 
     induction l1; simpl in *; intuition eauto.
   Qed.
 
@@ -1095,7 +1097,7 @@ Section Update2Rel.
       h <> from -> 
       collate_ls A_eq_dec (l1 ++ h :: l2) f to m from to =
       collate_ls A_eq_dec  (l1 ++ l2) f to m from to.
-  Proof using.
+  Proof.
     induction l1; simpl in *; auto.
     intros.
     apply collate_ls_f_eq.
@@ -1110,7 +1112,7 @@ Section Update2Rel.
     forall h h' l1 l2 (f : A -> A -> list B) m,
       ~ In h' (l1 ++ l2) ->
       collate_ls A_eq_dec (l1 ++ l2) (update2 A_eq_dec f h' h (f h' h ++ [m])) h m = collate_ls A_eq_dec (l1 ++ h' :: l2) f h m.
-  Proof using.
+  Proof.
     intros h h' l1 l2 f m H_in.
     apply functional_extensionality; intro from.
     apply functional_extensionality; intro to.
@@ -1161,7 +1163,7 @@ Section Update2Rel.
       NoDup l ->
       Permutation l l' ->
       collate_ls A_eq_dec l f h m = collate_ls A_eq_dec l' f h m.
-  Proof using.
+  Proof.
     intros l f h m l'.
     revert f l'.
     induction l.

@@ -3,6 +3,8 @@ From Coq Require Import Sorting.Permutation.
 From StructTact Require Import StructTactics ListTactics.
 Import ListNotations.
 
+Set Default Proof Using "Type".
+
 Set Implicit Arguments.
 
 Notation member := (in_dec eq_nat_dec).
@@ -33,7 +35,7 @@ Section list_util.
   Lemma list_neq_cons :
     forall (l : list A) x,
       x :: l <> l.
-  Proof using.
+  Proof.
     intros l x H.
     symmetry in H.
     induction l;
@@ -45,7 +47,7 @@ Section list_util.
       x <> y ->
       In y xs ->
       In y (remove A_eq_dec x xs).
-  Proof using.
+  Proof.
     induction xs; intros.
     - intuition auto.
     - simpl in *.
@@ -57,7 +59,7 @@ Section list_util.
     forall (x y : A) xs,
       In y (remove A_eq_dec x xs) ->
       In y xs.
-  Proof using.
+  Proof.
     induction xs; intros.
     - auto.
     - simpl in *. break_if; simpl in *; intuition auto.
@@ -66,7 +68,7 @@ Section list_util.
   Lemma remove_partition :
     forall xs (p : A) ys,
       remove A_eq_dec p (xs ++ p :: ys) = remove A_eq_dec p (xs ++ ys).
-  Proof using.
+  Proof.
     induction xs; intros; simpl; break_if; congruence.
   Qed.
 
@@ -74,7 +76,7 @@ Section list_util.
     forall (x : A) xs,
       ~ In x xs ->
       remove A_eq_dec x xs = xs.
-  Proof using.
+  Proof.
     intros. induction xs; simpl in *; try break_if; intuition congruence.
   Qed.
 
@@ -96,7 +98,7 @@ Section list_util.
 
   Lemma filter_app : forall (f : A -> bool) xs ys,
       filter f (xs ++ ys) = filter f xs ++ filter f ys.
-  Proof using.
+  Proof.
     induction xs; intros.
     - auto.
     - simpl. rewrite IHxs. break_if; auto.
@@ -105,7 +107,7 @@ Section list_util.
   Lemma filter_fun_ext_eq : forall f g xs,
       (forall a : A, In a xs -> f a = g a) ->
       filter f xs = filter g xs.
-  Proof using.
+  Proof.
     induction xs; intros.
     - auto.
     - simpl. rewrite H by intuition (auto with datatypes). 
@@ -138,7 +140,7 @@ Section list_util.
       (forall x y, In x xs -> In y xs ->
               f x = f y -> x = y) ->
       NoDup xs -> NoDup (map f xs).
-  Proof using.
+  Proof.
     induction xs; intros.
     - constructor.
     - simpl. invc_NoDup. constructor.
@@ -154,7 +156,7 @@ Section list_util.
       NoDup l' ->
       (forall a, In a l -> ~ In a l') ->
       NoDup (l ++ l').
-  Proof using.
+  Proof.
     induction l; intros.
     - auto.
     - simpl. invc_NoDup. constructor.
@@ -169,7 +171,7 @@ Section list_util.
       l = xs' ++ y' :: zs' ->
       f y = f y' ->
       xs = xs'.
-  Proof using.
+  Proof.
     induction xs; simpl; intros; destruct xs'.
     - auto.
     - subst. simpl in *. find_inversion.
@@ -186,7 +188,7 @@ Section list_util.
     forall p (l : list A),
       NoDup l ->
       NoDup (filter p l).
-  Proof using.
+  Proof.
     induction l; intros.
     - auto.
     - invc_NoDup. simpl. break_if; auto.
@@ -198,7 +200,7 @@ Section list_util.
     forall (f : A -> B) g l,
       NoDup (map f l) ->
       NoDup (map f (filter g l)).
-  Proof using.
+  Proof.
     intros. induction l; simpl in *.
     - constructor.
     - invc_NoDup. concludes.
@@ -213,7 +215,7 @@ Section list_util.
   Lemma filter_true_id : forall (f : A -> bool) xs,
       (forall x, In x xs -> f x = true) ->
       filter f xs = xs.
-  Proof using.
+  Proof.
     induction xs; intros.
     - auto.
     - simpl. now rewrite H, IHxs by intuition (auto with datatypes).
@@ -221,7 +223,7 @@ Section list_util.
 
   Lemma map_of_map : forall (f : A -> B) (g : B -> C) xs,
       map g (map f xs) = map (fun x => g (f x)) xs.
-  Proof using.
+  Proof.
     induction xs; simpl; auto using f_equal2.
   Qed.
 
@@ -231,7 +233,7 @@ Section list_util.
             f y = g y) ->
       g x = false ->
       filter f (remove A_eq_dec x xs) = filter g xs.
-  Proof using.
+  Proof.
     induction xs; intros.
     - auto.
     - simpl.
@@ -244,7 +246,7 @@ Section list_util.
   Lemma flat_map_nil : forall (f : A -> list B) l,
       flat_map f l = [] ->
       l = [] \/ (forall x, In x l -> f x = []).
-  Proof using.
+  Proof.
     induction l; intros.
     - intuition auto.
     - right. simpl in *.
@@ -258,7 +260,7 @@ Section list_util.
       NoDup l ->
       Permutation l l' ->
       NoDup l'.
-  Proof using.
+  Proof.
     intros l l' Hnd Hp.
     induction Hp; auto; invc_NoDup; constructor;
       eauto using Permutation_in, Permutation_sym;
@@ -268,7 +270,7 @@ Section list_util.
   Theorem NoDup_append :
     forall l (a : A),
       NoDup (l ++ [a]) <-> NoDup (a :: l).
-  Proof using. 
+  Proof. 
     intuition eauto using NoDup_Permutation_NoDup, Permutation_sym, Permutation_cons_append.
   Qed.
 
@@ -279,7 +281,7 @@ Section list_util.
       In x xs ->
       In y xs ->
       x = y.
-  Proof using.
+  Proof.
     induction xs; intros; simpl in *.
     - intuition auto.
     - invc_NoDup. intuition auto; subst; auto; exfalso.
@@ -290,7 +292,7 @@ Section list_util.
   Lemma remove_length_not_in : forall (x : A) xs,
       ~ In x xs ->
       length (remove A_eq_dec x xs) = length xs.
-  Proof using.
+  Proof.
     induction xs; intros.
     - auto.
     - simpl in *. intuition auto.
@@ -301,7 +303,7 @@ Section list_util.
       In x xs ->
       NoDup xs ->
       S (length (remove A_eq_dec x xs)) = length xs.
-  Proof using.
+  Proof.
     induction xs; intros; simpl in *; intuition; invc_NoDup;
       break_if; subst; intuition (simpl; try congruence).
     now rewrite remove_length_not_in.
@@ -315,7 +317,7 @@ Section list_util.
         (forall x : A, In x xs -> In x ys) ->
         length xs = length ys ->
         (forall x, In x ys -> In x xs).
-  Proof using.
+  Proof.
     induction xs; intros.
     - destruct ys; simpl in *; congruence.
     - invc_NoDup. concludes.
@@ -341,7 +343,7 @@ Section list_util.
     forall (x : A) xs,
       NoDup xs ->
       NoDup (remove A_eq_dec x xs).
-  Proof using.
+  Proof.
     induction xs; intros.
     - auto with struct_util.
     - invc_NoDup. simpl. break_if; eauto 6 using in_remove with struct_util.
@@ -350,7 +352,7 @@ Section list_util.
   Lemma remove_length_ge : forall (x : A) xs,
       NoDup xs ->
       length (remove A_eq_dec x xs) >= length xs - 1.
-  Proof using.
+  Proof.
     induction xs; intros.
     - auto.
     - invc_NoDup. simpl. break_if.
@@ -363,7 +365,7 @@ Section list_util.
   Lemma remove_length_le :
     forall (x : A) xs eq_dec,
       length xs >= length (remove eq_dec x xs).
-  Proof using.
+  Proof.
     induction xs; intros.
     - auto.
     - simpl in *.
@@ -375,7 +377,7 @@ Section list_util.
     forall (x : A) xs eq_dec,
       In x xs ->
       length xs > length (remove eq_dec x xs).
-  Proof using.
+  Proof.
     induction xs; intros; simpl in *; [contradiction|]; break_or_hyp.
     - subst.
       break_if; try congruence.
@@ -411,7 +413,7 @@ Section list_util.
     forall xs (y : A) zs w,
       xs ++ y :: zs = [w] ->
       xs = [] /\ y = w /\ zs = [].
-  Proof using.
+  Proof.
     intros.
     destruct xs.
     - solve_by_inversion.
@@ -422,7 +424,7 @@ Section list_util.
     forall (l : list A) xs a ys,
       l = xs ++ a :: ys ->
       In a l.
-  Proof using.
+  Proof.
     intros. subst. auto with datatypes.
   Qed.
   Hint Resolve app_cons_in : struct_util.
@@ -432,7 +434,7 @@ Section list_util.
       l = xs ++ a :: ys ->
       In b (xs ++ ys) ->
       In b l.
-  Proof using.
+  Proof.
     intros. subst.
     do_in_app; intuition auto with datatypes.
   Qed.
@@ -444,7 +446,7 @@ Section list_util.
       In b l ->
       a <> b ->
       In b (xs ++ ys).
-  Proof using.
+  Proof.
     intros.
     subst_max.
     do_in_app.
@@ -458,7 +460,7 @@ Section list_util.
   Lemma remove_filter_commute :
     forall (l : list A) A_eq_dec f x,
       remove A_eq_dec x (filter f l) = filter f (remove A_eq_dec x l).
-  Proof using.
+  Proof.
     induction l; intros; simpl in *; auto.
     repeat (break_if; subst; simpl in *; try congruence).
   Qed.
@@ -467,7 +469,7 @@ Section list_util.
     forall (f : A -> bool) x l l',
       filter f l = l' ->
       In x l' -> In x l.
-  Proof using.
+  Proof.
     intros. subst.
     eapply filter_In; eauto.
   Qed.
@@ -477,7 +479,7 @@ Section list_util.
       NoDup (l1 ++ x :: l2) ->
       filter f (l1 ++ x :: l2) = (l1' ++ x :: l2') ->
       filter f l1 = l1' /\ filter f l2 = l2'.
-  Proof using.
+  Proof.
     induction l1; intros; simpl in *; break_if; simpl in *; invc_NoDup.
     - destruct l1'; simpl in *.
       + solve_by_inversion.
@@ -495,7 +497,7 @@ Section list_util.
       (forall b, f (g b) = b) ->
       lb = map f la ->
       la = map g lb.
-  Proof using.
+  Proof.
     destruct la; intros; simpl in *.
     - subst. reflexivity.
     - destruct lb; try congruence.
@@ -512,7 +514,7 @@ Section list_util.
       In(A:=A) x l ->
       ~ In(A:=A) y l ->
       x <> y.
-  Proof using.
+  Proof.
     intuition congruence.
   Qed.
 
@@ -521,7 +523,7 @@ Section list_util.
       In(A:=A) a (x :: xs) ->
       a <> x ->
       In a xs.
-  Proof using.
+  Proof.
     simpl.
     intuition congruence.
   Qed.
@@ -531,7 +533,7 @@ Section list_util.
       NoDup (xs ++ ys ++ b :: zs) ->
       In b xs ->
       False.
-  Proof using.
+  Proof.
     intros.
     rewrite app_assoc in *.
     find_apply_lem_hyp NoDup_remove.
@@ -544,7 +546,7 @@ Section list_util.
       NoDup (xs ++ ys ++ b :: zs) ->
       In b ys ->
       False.
-  Proof using.
+  Proof.
     intros.
     rewrite app_assoc in *.
     find_apply_lem_hyp NoDup_remove_2.
@@ -557,7 +559,7 @@ Section list_util.
       NoDup (xs ++ ys ++ b :: zs) ->
       In b zs ->
       False.
-  Proof using.
+  Proof.
     intros.
     rewrite app_assoc in *.
     find_apply_lem_hyp NoDup_remove_2.
@@ -569,7 +571,7 @@ Section list_util.
     forall xs ys zs x y a,
       In (A:=A) a (xs ++ ys ++ zs) ->
       In a (xs ++ x :: ys ++ y :: zs).
-  Proof using.
+  Proof.
     intros.
     repeat (do_in_app; intuition auto 10 with datatypes).
   Qed.
@@ -580,7 +582,7 @@ Section list_util.
       a <> x ->
       a <> y ->
       In a (xs ++ ys ++ zs).
-  Proof using.
+  Proof.
     intros.
     repeat (do_in_app; simpl in *; intuition (auto with datatypes; try congruence)).
   Qed.
@@ -590,7 +592,7 @@ Section list_util.
       In (A:=A) a (xs ++ y :: zs) ->
       a <> y ->
       In a (xs ++ zs).
-  Proof using.
+  Proof.
     intros.
     do_in_app; simpl in *; intuition auto with datatypes. congruence.
   Qed.
@@ -599,7 +601,7 @@ Section list_util.
     forall a xs y zs,
       In (A:=A) a (xs ++ zs) ->
       In a (xs ++ y :: zs).
-  Proof using.
+  Proof.
     intros.
     do_in_app; simpl in *; intuition auto with datatypes.
   Qed.
@@ -608,7 +610,7 @@ Section list_util.
     forall l,
       NoDup (A:=A) l ->
       NoDup (rev l).
-  Proof using.
+  Proof.
     induction l; intros; simpl.
     - auto.
     - apply NoDup_append.
@@ -624,7 +626,7 @@ Section list_util.
       (forall x y, In x xs -> In y xs -> f x = f y -> g x = g y) ->
       NoDup (map g xs) ->
       NoDup (map f xs).
-  Proof using.
+  Proof.
     induction xs; intros; simpl in *.
     - constructor.
     - invc_NoDup.
@@ -677,7 +679,7 @@ Section list_util.
   Lemma snoc_assoc :
     forall (l : list A) x y,
       l ++ [x; y] = (l ++ [x]) ++ [y].
-  Proof using.
+  Proof.
     induction l; intros; simpl; intuition.
     auto using f_equal.
   Qed.
@@ -685,7 +687,7 @@ Section list_util.
   Lemma cons_cons_app :
     forall (x y : A),
       [x; y] = [x] ++ [y].
-  Proof using.
+  Proof.
     auto.
   Qed.
 
@@ -696,7 +698,7 @@ Section list_util.
         l = l1 ++ l2 /\
         map f l1 = xs /\
         map f l2 = ys.
-  Proof using.
+  Proof.
     induction l; simpl; intros xs ys H.
     - symmetry in H. apply app_eq_nil in H. break_and. subst.
       exists [], []. auto.
@@ -718,7 +720,7 @@ Section list_util.
         map f ap = p /\
         f a = x /\
         map f ap' = p'.
-  Proof using.
+  Proof.
     intros p l x p' f H_m.
     pose proof map_eq_inv f _ _ _ H_m.
     break_exists_name l1.
@@ -737,14 +739,14 @@ Section list_util.
     forall (f : A -> B),
       (forall a a', f a = f a' -> a = a') ->
       forall l l', map f l = map f l' -> l = l'.
-  Proof using.
+  Proof.
     induction l; simpl; intros l' Heq; destruct l'; simpl in *; try congruence.
     find_inversion. auto using f_equal2.
   Qed.
 
   Lemma map_fst_snd_id :
     forall l, map (fun t : A * B => (fst t, snd t)) l = l.
-  Proof using.
+  Proof.
     intros.
     rewrite <- map_id.
     apply map_ext.
@@ -753,14 +755,14 @@ Section list_util.
 
   Lemma in_firstn : forall n (x : A) xs,
       In x (firstn n xs) -> In x xs.
-  Proof using.
+  Proof.
     induction n; simpl; intuition; break_match; simpl in *; intuition.
   Qed.
 
   Lemma firstn_NoDup : forall n (xs : list A),
     NoDup xs ->
     NoDup (firstn n xs).
-  Proof using.
+  Proof.
     induction n; intros; simpl; destruct xs; auto with struct_util.
     invc_NoDup.
     eauto 6 using in_firstn with struct_util.
@@ -770,7 +772,7 @@ Section list_util.
     forall (a : A) (l l' : list A),
     NoDup (l ++ a :: l') ->
     ~ In a (l ++ l').
-  Proof using.
+  Proof.
     induction l; intros; simpl in *.
     - invc_NoDup; auto.
     - invc_NoDup.
@@ -787,7 +789,7 @@ Section list_util.
     forall (ns ns' : list A) (n : A),
       Permutation (n :: ns) ns' ->
       exists ns0, exists ns1, ns' = ns0 ++ n :: ns1.
-  Proof using.
+  Proof.
     intros l l' a H_pm.
     assert (In a (a :: l)); auto with datatypes.
     assert (In a l'); eauto using Permutation_in.
@@ -797,7 +799,7 @@ Section list_util.
   Lemma NoDup_app_left :
     forall (l l' : list A),
       NoDup (l ++ l') -> NoDup l.
-  Proof using.
+  Proof.
     induction l; intros; simpl in *.
     - apply NoDup_nil.
     - invc_NoDup.
@@ -812,7 +814,7 @@ Section list_util.
   Lemma NoDup_app_right :
     forall (l l' : list A),
       NoDup (l ++ l') -> NoDup l'.
-  Proof using.
+  Proof.
     induction l; intros; simpl in *; auto.
     invc_NoDup.
     find_apply_hyp_hyp; auto.
@@ -821,7 +823,7 @@ Section list_util.
   Lemma NoDup_in_not_in_right :
     forall (l l' : list A) (a : A),
       NoDup (l ++ l') -> In a l -> ~ In a l'.
-  Proof using.
+  Proof.
     induction l; intros; simpl in *; auto.
     invc_NoDup.
     break_or_hyp; eauto with datatypes.
@@ -830,7 +832,7 @@ Section list_util.
   Lemma NoDup_in_not_in_left :
     forall (l l' : list A) (a : A),
     NoDup (l ++ l') -> In a l' -> ~ In a l.
-  Proof using.
+  Proof.
     intros.
     induction l; simpl in *; auto.
     invc_NoDup.
@@ -842,7 +844,7 @@ Section list_util.
   Lemma count_occ_app :
     forall l l' (a : A),
       count_occ A_eq_dec (l ++ l') a = count_occ A_eq_dec l a + count_occ A_eq_dec l' a.
-  Proof using.
+  Proof.
     intros.
     induction l; simpl in *; auto.
     break_if; auto.
@@ -854,7 +856,7 @@ Section list_util.
     forall l l' : list (A * B),
       Permutation l l' ->
       Permutation (map fst l) (map fst l').
-  Proof using.
+  Proof.
     induction l; intros; simpl in *.
     - find_apply_lem_hyp Permutation_nil.
       find_rewrite.
@@ -879,7 +881,7 @@ Section list_util.
       (forall nm, In nm l -> snd nm = m) ->
       ~ In (n, m) l ->
       ~ In n (map fst l).
-  Proof using.
+  Proof.
     intros.
     induction l; simpl in *; auto.
     intro.
@@ -899,7 +901,7 @@ Section list_util.
       NoDup nms ->
       (forall nm nm', In nm nms -> In nm' nms -> snd nm = snd nm') ->
       NoDup (map fst nms).
-  Proof using.
+  Proof.
     intros.
     induction nms; simpl in *.
     - apply NoDup_nil.
@@ -937,7 +939,7 @@ Section list_util.
       forall l a b,
         ~ In b l ->
         g (fold_left f l a) b = g a b.
-  Proof using A B C.
+  Proof.
     induction l as [| b' l']; simpl in *; auto.
     - intros. intuition.
       rewrite IHl'; auto.
@@ -952,7 +954,7 @@ Section list_util.
         In b l ->
         exists a',
           g (fold_left f l a) b = g (f a' b) b.
-  Proof using A B C.
+  Proof.
     induction l as [|b' l']; simpl in *; intuition; subst.
     destruct (in_dec B_eq_dec b l'); intuition.
     find_eapply_lem_hyp fold_left_for_each_not_in; eauto.
