@@ -37,7 +37,7 @@ Fixpoint fin_eq_dec (n : nat) : forall (a b : fin n), {a = b} + {a <> b} :=
            (match Heq in (_ = f) return (f = Some b' -> False) with
             | eq_refl =>
                 fun H => (fun H0 => False_ind False (eq_ind None
-                 (fun e : fin (S n') => match e with | Some _ => False | None => True end) I (Some b') H0)) H
+                 (fun e : fin (S n') => match e with Some _ => False | None => True end) I (Some b') H0)) H
             end) eq_refl)
      | None, None => left eq_refl
      end
