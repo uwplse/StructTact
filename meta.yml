@@ -18,7 +18,7 @@ description: |-
   proof development, structural tactics will still work.
 
 publications:
-- pub_url: http://verdi.uwplse.org/verdi.pdf
+- pub_url: https://homes.cs.washington.edu/~mernst/pubs/verify-distsystem-pldi2015.pdf
   pub_title: 'Verdi: A Framework for Implementing and Verifying Distributed Systems'
   pub_doi: 10.1145/2737924.2737958
 

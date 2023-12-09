@@ -6,8 +6,8 @@ Follow the instructions on https://github.com/coq-community/templates to regener
 
 [![Docker CI][docker-action-shield]][docker-action-link]
 
-[docker-action-shield]: https://github.com/uwplse/StructTact/workflows/Docker%20CI/badge.svg?branch=master
-[docker-action-link]: https://github.com/uwplse/StructTact/actions?query=workflow:"Docker%20CI"
+[docker-action-shield]: https://github.com/uwplse/StructTact/actions/workflows/docker-action.yml/badge.svg?branch=master
+[docker-action-link]: https://github.com/uwplse/StructTact/actions/workflows/docker-action.yml
 
 
 
@@ -31,7 +31,7 @@ proof development, structural tactics will still work.
 - Additional dependencies: none
 - Coq namespace: `StructTact`
 - Related publication(s):
-  - [Verdi: A Framework for Implementing and Verifying Distributed Systems](http://verdi.uwplse.org/verdi.pdf) doi:[10.1145/2737924.2737958](https://doi.org/10.1145/2737924.2737958)
+  - [Verdi: A Framework for Implementing and Verifying Distributed Systems](https://homes.cs.washington.edu/~mernst/pubs/verify-distsystem-pldi2015.pdf) doi:[10.1145/2737924.2737958](https://doi.org/10.1145/2737924.2737958)
 
 ## Building and installation instructions
 

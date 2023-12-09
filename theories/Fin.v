@@ -11,23 +11,37 @@ Fixpoint fin (n : nat) : Type :=
     | S n' => option (fin n')
   end.
 
-Fixpoint fin_eq_dec (n : nat) : forall (a b : fin n), {a = b} + {a <> b}.
-  refine
-   (match n with
-      | 0 => fun a b : fin 0 => right (match b with end)
-      | S n' => fun a b : fin (S n') =>
-                 match a, b with
-                   | Some a', Some b' =>
-                     match fin_eq_dec n' a' b' with
-                       | left _ _ => left _
-                       | right _ _ => right _
-                     end
-                   | Some a', None => right _
-                   | None, Some b' => right _
-                   | None, None => left eq_refl
-                 end
-    end); congruence.
-Defined.
+Fixpoint fin_eq_dec (n : nat) : forall (a b : fin n), {a = b} + {a <> b} :=
+  match n with
+  | 0 => fun a b : fin 0 => right (match b with end)
+  | S n' => fun a b : fin (S n') =>
+     match a, b with
+     | Some a', Some b' =>
+         match fin_eq_dec n' a' b' with
+         | left _ e =>
+             left (eq_ind_r (fun x => Some x = _) eq_refl e)
+         | right _ ne =>
+             right (fun Hab : Some a' = Some b' =>
+               (fun Heq => False_ind False (ne Heq))
+                 (f_equal (fun e : fin (S n') => match e with Some f => f | None => a' end) Hab))
+           end
+     | Some a', None =>
+         right (fun Heq =>
+           (match Heq in (_ = f) return (f = None -> False) with
+            | eq_refl =>
+                fun H => (fun H0 => False_ind False (eq_ind (Some a')
+                  (fun e : fin (S n') => match e with Some _ => True | None => False end) I None H0)) H
+            end) eq_refl)
+     | None, Some b' =>
+         right (fun Heq =>
+           (match Heq in (_ = f) return (f = Some b' -> False) with
+            | eq_refl =>
+                fun H => (fun H0 => False_ind False (eq_ind None
+                 (fun e : fin (S n') => match e with Some _ => False | None => True end) I (Some b') H0)) H
+            end) eq_refl)
+     | None, None => left eq_refl
+     end
+  end.
 
 Fixpoint all_fin (n : nat) : list (fin n) :=
   match n with
